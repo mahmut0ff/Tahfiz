@@ -18,9 +18,7 @@ urlpatterns = [
     path('exam/', include('apps.exam.urls')),
     path('grade/', include('apps.grade.urls')),
     path('api/', include('apps.api.urls')),
-
     
 ]
-
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
