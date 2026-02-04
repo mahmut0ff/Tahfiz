@@ -207,6 +207,11 @@
 /* Schedule Table */
 .schedule-table {
     font-size: 0.9rem;
+    overflow: visible;
+}
+
+.schedule-table thead {
+    overflow: visible;
 }
 
 .schedule-table th,
@@ -346,19 +351,21 @@
     background-color: #198754 !important;
     border-color: #198754 !important;
     position: relative;
+    overflow: visible;
 }
 
 .table-primary th.current-day::after {
     content: "Сегодня";
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: 2px;
+    right: 2px;
     background: #ffc107;
     color: #000;
-    font-size: 0.6rem;
-    padding: 2px 6px;
-    border-radius: 10px;
+    font-size: 0.55rem;
+    padding: 1px 4px;
+    border-radius: 8px;
     font-weight: 600;
+    z-index: 1;
 }
 
 .table-primary th .badge {
