@@ -137,3 +137,10 @@ LOGIN_REDIRECT_URL = 'dashboard:dashboard'
 LOGOUT_REDIRECT_URL = 'user:login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CSRF and security settings for HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://tahfiz.kg',
+    'https://www.tahfiz.kg',
+]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
