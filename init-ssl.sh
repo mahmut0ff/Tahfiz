@@ -9,7 +9,7 @@ if [ -z "$1" ]; then
 fi
 
 EMAIL=$1
-DOMAIN="tahfiz.site"
+DOMAIN="tahfiz.kg"
 
 echo "==> Копируем временный nginx конфиг..."
 cp nginx/nginx-init.conf nginx/nginx.conf.bak
