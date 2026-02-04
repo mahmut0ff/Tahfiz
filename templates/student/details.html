@@ -1,92 +1,174 @@
+
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
-<div class="modal fade" id="modalCenter" tabindex="-1" style="display: none;" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalCenterTitle">Удаление</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Student Profile Card -->
+    <div class="col-xl-4 col-lg-5 col-md-5">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="user-avatar-section">
+            <div class="d-flex align-items-center flex-column">
+              {% if student.image %}
+                <img class="img-fluid rounded mb-3 pt-1 mt-4" src="{{ student.image.url }}" height="120" width="120" alt="User avatar">
+              {% else %}
+                <img class="img-fluid rounded mb-3 pt-1 mt-4" src="{% static 'assets/img/user_default.jpg' %}" height="120" width="120" alt="User avatar">
+              {% endif %}
+              <div class="user-info text-center">
+                <h4 class="mb-2">{{ student.name }}</h4>
+                <span class="badge bg-label-{% if student.student_status == 'active' %}success{% elif student.student_status == 'graduated' %}info{% elif student.student_status == 'inactive' %}warning{% else %}danger{% endif %} me-1">
+                  {% if student.student_status == 'active' %}Активный
+                  {% elif student.student_status == 'graduated' %}Выпускник
+                  {% elif student.student_status == 'inactive' %}Неактивный
+                  {% else %}Исключен{% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-around flex-wrap mt-3 pt-3 pb-4 border-bottom">
+            <div class="d-flex align-items-start me-4 mt-3 gap-2">
+              <span class="badge bg-label-primary p-2 rounded"><i class="bx bx-group bx-sm"></i></span>
+              <div>
+                <p class="mb-0 fw-semibold">{{ student.group.count }}</p>
+                <small>Групп</small>
+              </div>
+            </div>
+            <div class="d-flex align-items-start mt-3 gap-2">
+              <span class="badge bg-label-primary p-2 rounded"><i class="bx bx-book bx-sm"></i></span>
+              <div>
+                <p class="mb-0 fw-semibold">{{ student.course|default:"Не указан" }}</p>
+                <small>Курс</small>
+              </div>
+            </div>
+          </div>
+          <p class="mt-4 small text-uppercase text-muted">Детали</p>
+          <div class="info-container">
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <span class="fw-semibold me-1">Телефон:</span>
+                <span>{{ student.phone|default:"Не указан" }}</span>
+              </li>
+              <li class="mb-2">
+                <span class="fw-semibold me-1">Статус обучения:</span>
+                <span class="badge bg-label-{% if student.status %}success{% else %}danger{% endif %}">
+                  {% if student.status %}Обучается{% else %}Не обучается{% endif %}
+                </span>
+              </li>
+              <li class="mb-2">
+                <span class="fw-semibold me-1">К оплате:</span>
+                <span>{{ student.to_pay|default:"0" }} сом</span>
+              </li>
+              <li class="mb-2">
+                <span class="fw-semibold me-1">Логин:</span>
+                <span>{{ student.user.username }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <div class="modal-body">
-        <p>Вы действительно желаете удалить студента <u>{{ student.name }}</u>?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Закрыть</button>
-        <a href="{% url 'student-delete' student.id %}" class="btn btn-danger">Удалить</a>
+      
+      <!-- Groups Card -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <p class="card-text text-uppercase fw-semibold">Группы</p>
+          {% for group in student.group.all %}
+            <div class="d-flex mb-3 pb-1">
+              <div class="avatar flex-shrink-0 me-3">
+                <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-group"></i></span>
+              </div>
+              <div class="row w-100 align-items-center">
+                <div class="col-sm-8 mb-1 mb-sm-0">
+                  <h6 class="mb-0">{{ group.title }}</h6>
+                  <small class="text-muted">{{ group.description|default:"Описание отсутствует" }}</small>
+                </div>
+                <div class="col-sm-4 text-sm-end">
+                  <a href="{% url 'group:details' group.pk %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bx bx-show"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <p class="text-muted">Студент не состоит в группах</p>
+          {% endfor %}
+        </div>
       </div>
     </div>
-  </div>
-</div>
-<div class="row justify-content-center mt-5">
-  <div class="col-md-5">
-    <div class="card mb-4">
-      <div class="card-body">
-        <form id="formAccountSettings" method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="row justify-content-center">
-            <div class="mb-3 col-md-6 text-center">
-              {% if student.image %}
-                <img src="{{ student.image.url }}" class="rounded-circle" width="150" height="150" style="object-fit: cover;" alt="">
-              {% else %}
-                <img src="{% static 'assets/img/logo/logo.png' %}" class="rounded-circle" width="150" height="150" style="object-fit: cover;" alt="">
-              {% endif %}
-            </div>
+
+    <!-- Student Edit Form -->
+    <div class="col-xl-8 col-lg-7 col-md-7">
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Редактирование профиля студента</h5>
+          <div>
+            {% if student.student_status == 'active' %}
+              <a href="{% url 'graduate:make_graduate' student.pk %}" class="btn btn-success btn-sm">
+                <i class="bx bx-medal me-1"></i>Перевести в выпускники
+              </a>
+            {% elif student.student_status == 'graduated' %}
+              <a href="{% url 'graduate:detail' student.graduate_info.pk %}" class="btn btn-info btn-sm">
+                <i class="bx bx-show me-1"></i>Просмотр выпускника
+              </a>
+            {% endif %}
           </div>
-          <div class="row align-items-center justify-content-center">
-            <div class="mb-3 col-md-12">
-              <label for="name" class="form-label">Изображение</label>
-              {{ form.image }}
-            </div>
-          </div>
-          <div class="row">
-              <div class="mb-3 col-md-6">
-                <label for="name" class="form-label">Полное имя</label>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="id_name" class="form-label">Полное имя</label>
                 {{ form.name }}
               </div>
-              <div class="mb-3 col-md-6">
-                <label for="phone" class="form-label">Контактный номер</label>
+              <div class="col-md-6 mb-3">
+                <label for="id_phone" class="form-label">Контактный номер</label>
                 {{ form.phone }}
               </div>
-              <div class="mb-3 col-md-6">
-                <label for="to_pay" class="form-label">К оплате</label>
+              <div class="col-md-6 mb-3">
+                <label for="id_course" class="form-label">Курс</label>
+                {{ form.course }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="id_to_pay" class="form-label">Сумма к оплате (сом)</label>
                 {{ form.to_pay }}
               </div>
-
-              <div class="mb-3">
-                <label for="status" class="form-label">Обучается</label>
-                {{ form.status }}
+              <div class="col-md-6 mb-3">
+                <label for="id_status" class="form-label">Статус обучения</label>
+                <div class="form-check form-switch">
+                  {{ form.status }}
+                  <label class="form-check-label" for="id_status">Обучается</label>
+                </div>
               </div>
-              <div class="mb-3">
-            <div class="accordion-item card p-3">
-              <h2 class="accordion-header text-body d-flex justify-content-between" id="accordionIconOne">
-                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                  data-bs-target="#accordionIcon-2" aria-controls="accordionIcon-2" aria-expanded="false">
-                  Группы
-                </button>
-              </h2>
-              <div id="accordionIcon-2" class="accordion-collapse collapse" data-bs-parent="#accordionIcon" style="">
-                <div class="accordion-body">
-                  {{ form.group }}
+              <div class="col-md-6 mb-3">
+                <label for="id_student_status" class="form-label">Статус студента</label>
+                {{ form.student_status }}
+              </div>
+              <div class="col-12 mb-3">
+                <label for="id_image" class="form-label">Фотография</label>
+                {{ form.image }}
+                <div class="form-text">Разрешенные форматы: JPG, PNG, JPEG. Максимальный размер: 5MB</div>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label">Группы</label>
+                <div class="card">
+                  <div class="card-body">
+                    {{ form.group }}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-              <div class="mb-3">
-                <label for="login" class="form-label">Логин:</label>
-                {{ student.user.username }}
-              </div>
-              <div class="mt-2 d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary me-2">Сохранить</button>
-                <div>
-                  <a href="{% url 'transaction-create' student.id %}" class="btn btn-success">Оплаты</a>
-                  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalCenter">
-                    Удалить
-                  </button>
-                </div>
-              </div>
+            <div class="pt-4">
+              <button type="submit" class="btn btn-primary me-sm-3 me-1">
+                <i class="bx bx-save me-1"></i>Сохранить изменения
+              </button>
+              <a href="{% url 'student:list' %}" class="btn btn-label-secondary">
+                <i class="bx bx-arrow-back me-1"></i>Назад к списку
+              </a>
             </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   </div>

@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Перевести в выпускники - {{ student.name }}{% endblock %}
+
+{% block content %}
+{% include 'includes/messages.html' %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Перевести студента в выпускники</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Информация о студенте -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center">
+                            {% if student.image %}
+                                <img src="{{ student.image.url }}" 
+                                     alt="{{ student.name }}" 
+                                     class="rounded-circle mb-3" 
+                                     width="100" height="100">
+                            {% else %}
+                                <img src="{% static 'assets/img/user_default.jpg' %}" 
+                                     alt="{{ student.name }}" 
+                                     class="rounded-circle mb-3" 
+                                     width="100" height="100">
+                            {% endif %}
+                            <h6>{{ student.name }}</h6>
+                            <p class="text-muted">
+                                {% if student.course %}
+                                    {{ student.course.name }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="alert alert-info" role="alert">
+                                <i class="bx bx-info-circle me-2"></i>
+                                <strong>Внимание!</strong> После перевода в выпускники студент {{ student.name }} 
+                                получит статус "Выпускник" и будет перемещен в соответствующий раздел.
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Display form errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {% for error in form.non_field_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.graduation_date.id_for_label }}" class="form-label">{{ form.graduation_date.label }} *</label>
+                                {{ form.graduation_date }}
+                                {% if form.graduation_date.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.graduation_date.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.graduation_group.id_for_label }}" class="form-label">{{ form.graduation_group.label }}</label>
+                                {{ form.graduation_group }}
+                                {% if form.graduation_group.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.graduation_group.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.final_grade.id_for_label }}" class="form-label">{{ form.final_grade.label }}</label>
+                                {{ form.final_grade }}
+                                {% if form.final_grade.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.final_grade.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Оценка от 1 до 5</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.diploma_number.id_for_label }}" class="form-label">{{ form.diploma_number.label }}</label>
+                                {{ form.diploma_number }}
+                                {% if form.diploma_number.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.diploma_number.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.current_occupation.id_for_label }}" class="form-label">{{ form.current_occupation.label }}</label>
+                                {{ form.current_occupation }}
+                                {% if form.current_occupation.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.current_occupation.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.contact_phone.id_for_label }}" class="form-label">{{ form.contact_phone.label }}</label>
+                                {{ form.contact_phone }}
+                                {% if form.contact_phone.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.contact_phone.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Текущий: {{ student.phone }}</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.contact_email.id_for_label }}" class="form-label">{{ form.contact_email.label }}</label>
+                            {{ form.contact_email }}
+                            {% if form.contact_email.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.contact_email.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.achievements.id_for_label }}" class="form-label">{{ form.achievements.label }}</label>
+                            {{ form.achievements }}
+                            {% if form.achievements.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.achievements.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Достижения студента во время обучения</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.notes.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'student:details' student.pk %}" class="btn btn-secondary">Отмена</a>
+                            <button type="submit" class="btn btn-success" id="graduateBtn">
+                                <i class="bx bx-check me-1"></i>Перевести в выпускники
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('graduateBtn').addEventListener('click', function(e) {
+    // Показываем индикатор загрузки
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Обработка...';
+    this.disabled = true;
+    
+    // Отправляем форму через небольшую задержку для показа индикатора
+    setTimeout(() => {
+        this.closest('form').submit();
+    }, 100);
+});
+</script>
+{% endblock %}

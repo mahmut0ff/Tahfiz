@@ -10,7 +10,7 @@ from .forms import *
 from apps.user.utils import is_admin
 
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 @is_admin
 def create(request):
     
@@ -20,7 +20,7 @@ def create(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Группа создана')
-            return redirect('group-create')
+            return redirect('group:create')
 
     context = {
         'form': form
@@ -28,12 +28,17 @@ def create(request):
     return render(request, 'group/create.html', context)
 
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 def list(request):
     
     
-    groups = Group.objects.all().order_by('-id')
     form = GroupForm()
+    groups = (
+    Group.objects
+    .select_related("course")                # подтянет курс через JOIN
+    .prefetch_related("teacher_set", "student_set")  # подтянет преподавателей и студентов отдельными запросами
+    .order_by("-id")
+    )
 
     if request.method == 'POST':
         form = GroupForm(request.POST)
@@ -53,7 +58,7 @@ def list(request):
     return render(request, 'group/list.html', context)
 
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 def details(request, pk):
     group = get_object_or_404(Group, id=pk)
     teachers = group.teacher_set.all()
@@ -73,18 +78,18 @@ def details(request, pk):
     return render(request, 'group/details.html', context)
 
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 @is_admin
 def update(request, pk):
     if request.user.role == 'student' or request.user.role == 'teacher':
-        return redirect('timetable')
+        return redirect('schedule:list')
     group = Group.objects.get(id=pk)
     form = GroupForm(instance=group)
     if request.method == 'POST':
         form = GroupForm(request.POST, instance=group)
         if form.is_valid():
             form.save()
-            return redirect('group-details', pk=pk)
+            return redirect('group:details', pk=pk)
     context = {
         'group': group,
         'form': form
@@ -92,9 +97,9 @@ def update(request, pk):
     return render(request, 'group/update.html', context)
 
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 @is_admin
 def delete(request, pk):
     group = Group.objects.get(id=pk)
     group.delete()
-    return redirect('group-list')
+    return redirect('group:list')

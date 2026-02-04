@@ -1,10 +1,11 @@
 from django.urls import path
 from .views import *
 
+app_name = 'administrator'
 
 urlpatterns = [
-    path('list/', list, name='administrator-list'),
-    path('create/', create, name='administrator-create'),
-    path('delete/<int:pk>/', delete, name='administrator-delete'),
-    path('details/<int:pk>/', details, name='administrator-details'),
+    path('', list, name='list'),
+    path('create/', create, name='create'),
+    path('<int:pk>/', details, name='details'),
+    path('<int:pk>/delete/', delete, name='delete'),
 ]

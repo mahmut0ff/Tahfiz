@@ -5,7 +5,7 @@ from .forms import *
 from apps.user.utils import generate_password
 from django.contrib import messages
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 def list(request):
     administrators = Administrator.objects.all().order_by('-id')
     context = {
@@ -13,7 +13,7 @@ def list(request):
     }
     return render(request, 'administrator/list.html', context)
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 def details(request, pk):
 
     administrator = Administrator.objects.get(id=pk)
@@ -22,12 +22,12 @@ def details(request, pk):
     if request.method == 'POST':
         if 'delete' in request.POST:
             administrator.delete()
-            return redirect('administrator-list')
+            return redirect('administrator:list')
         else:
             form = AdministratorForm(request.POST, instance=administrator)
             if form.is_valid():
                 form.save()
-                return redirect('administrator-details', pk=pk)
+                return redirect('administrator:details', pk=pk)
 
     context = {
         'administrator': administrator,
@@ -36,7 +36,7 @@ def details(request, pk):
     return render(request, 'administrator/details.html', context)
 
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 def create(request):
 
     form = AdministratorForm()
@@ -53,7 +53,7 @@ def create(request):
             form.instance.user = user
             form.save()
             messages.success(request, 'Администратор создан')
-            return redirect('administrator-create')
+            return redirect('administrator:create')
 
     context = {
         'form': form
@@ -61,10 +61,10 @@ def create(request):
     return render(request, 'administrator/create.html', context)
 
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 def delete(request, pk):
     administrator = Administrator.objects.get(id=pk)
     administrator.delete()
     user = User.objects.get(id=administrator.user.id)
     user.delete()
-    return redirect('administrator-list')
+    return redirect('administrator:list')

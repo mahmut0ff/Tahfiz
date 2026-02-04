@@ -14,45 +14,40 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
-                <a href="{% url 'group-delete' group.id %}" class="btn btn-danger">Удалить</a>
+                <a href="{% url 'group:delete' group.id %}" class="btn btn-danger">Удалить</a>
             </div>
         </div>
     </div>
 </div>
 
 <div class="row mb-3">
+    
     <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-header d-flex align-items-center justify-content-between">
-                <h5 class="card-title m-0">Информация о группе</h5>
-                <div class="dropdown">
-                    <button class="btn p-0" type="button" id="transactionID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <div class="card" style='background-image: url({% static "assets/Group 1.png" %});background-size: cover; background-position: center;'>
+                <div class="p-4 d-flex flex-column gap-2">
+                    
+                    <div class='d-flex justify-content-between align-items-center'>
+                            <span class=" text-white mb-1">Группа {{ group.title }}</span>
+
+                        <div class="dropdown">
+                    <button class="btn text-white p-0" type="button" id="transactionID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="bx bx-dots-vertical-rounded"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
-                        <li><button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#basicModal">Удалить</button></li>
-                        <li><a class="dropdown-item" href="{% url 'group-update' group.id %}">Изменить</a></li>
-                    </ul>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
+                            <li><button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#basicModal">Удалить</button></li>
+                            <li><a class="dropdown-item" href="{% url 'group:update' group.id %}">Изменить</a></li>
+                        </ul>
+                    </div>
+                       
                 </div>
+
+                            <div class="d-flex align-items-center mb-1">
+                                <h2 class="fw-bold text-white mb-0 me-2">Курс {{ group.course.title }}</h2>
+                            </div>
+                   
+                 
             </div>
-            <div class="card-body">
-                <ul class="list-unstyled">
-                    <li class="mb-2">
-                        <small class="text-muted">Название</small>
-                        <div>{{ group.title }}</div>
-                    </li>
-                    <li class="mb-2">
-                        <small class="text-muted">Курс</small>
-                        <div>{{ group.course.title }}</div>
-                    </li>
-                    <li>
-                        {% for subject in subject_count %}
-                            <span class='badge bg-label-primary me-1'>{{ subject.subject__name }}: {{ subject.total }} уроков</span>
-                        {% endfor %}
-                    </li>
-                </ul>
             </div>
-        </div>
     </div>
 
     <div class="col-xl-8">
@@ -76,7 +71,7 @@
                                     <div class="col-md-12 col-xl-6 mb-2">
                                         <div class="card bg-primary text-white h-100">
                                             <div class="card-body">
-                                                <h5 class="card-title">{{ schedule.time_slot }}. {{ schedule.subject.name }}</h5>
+                                                <h5 class="card-title text-white">{{ schedule.time_slot }}. {{ schedule.subject.name }}</h5>
                                                 <p class="card-text">
                                                     {% for teacher in schedule.subject.teacher_set.all %}
                                                         <span>{{ teacher.name }}</span>{% if not forloop.last %}, {% endif %}
@@ -98,23 +93,21 @@
 <div class="row gy-3">
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title">Список преподавателей <sup>({{ teachers.count }})</sup></h5>
-            </div>
-            <div class="card-body">
+            
+            <div class="">
                 <div class="table-responsive">
                     <table class="table table-bordered">
-                        <thead>
+                        <thead class='bg-primary'>
                             <tr>
-                                <th>Имя</th>
-                                <th>Телефон</th>
+                                <th class='text-white'>Преподаватель</th>
+                                <th class='text-white'>Телефон</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for teacher in teachers %}
                             <tr>
                                 <td>
-                                    <a href="{% url 'teacher-details' teacher.id %}">{{ teacher.name }}</a>
+                                    <a href="{% url 'teacher:details' teacher.id %}">{{ teacher.name }}</a>
                                 </td>
                                 <td>{{ teacher.phone }}</td>
                             </tr>
@@ -128,23 +121,21 @@
 
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title">Список студентов <sup>({{ students.count }})</sup></h5>
-            </div>
-            <div class="card-body">
+           
+            <div class="">
                 <div class="table-responsive">
                     <table class="table table-bordered">
-                        <thead>
+                        <thead class='bg-primary'>
                             <tr>
-                                <th>Имя</th>
-                                <th>Телефон</th>
+                                <th class='text-white'>Студент</th>
+                                <th class='text-white'>Телефон</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for student in students %}
                             <tr>
                                 <td>
-                                    <a href="{% url 'student-details' student.id %}">{{ student.name }}</a>
+                                    <a href="{% url 'student:details' student.id %}">{{ student.name }}</a>
                                 </td>
                                 <td>{{ student.phone }}</td>
                             </tr>

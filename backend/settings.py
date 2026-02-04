@@ -1,11 +1,11 @@
 from pathlib import Path
 import os
-from datetime import timedelta
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-t-jexhxi&n@tm&_q^3q2_6(^5m89-^5%q+f6#mv6&9y50@+zsd'
-DEBUG = False
-ALLOWED_HOSTS = ['tahfiz.site', 'cl17008-django-ksta7.tw1.ru']
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-t-jexhxi&n@tm&_q^3q2_6(^5m89-^5%q+f6#mv6&9y50@+zsd')
+DEBUG = config('DEBUG', default=True, cast=bool)  # По умолчанию False для продакшна
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='tahfiz.site,cl17008-django-ksta7.tw1.ru', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition
@@ -17,10 +17,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    #Installed apps
-    'rest_framework',
-    'rest_framework_simplejwt',
-
     # apps
     'apps.user',
     'apps.dashboard',
@@ -28,25 +24,10 @@ INSTALLED_APPS = [
     'apps.teacher',
     'apps.group',
     'apps.schedule',
-    'apps.transaction',
     'apps.administrator',
-    'apps.salary',
-    'apps.exam',
     'apps.grade',
+    'apps.graduate',
 ]
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-}
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=250),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -79,25 +60,39 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
+# Database Configuration
+# PostgreSQL for Docker
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cl17008_ksta7',
-        'USER': 'cl17008_ksta7',
-        'PASSWORD': 'Knyaz999',
-        'HOST': 'localhost',
-        'OPTIONS': {
-        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-    },
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME', default='tahfiz_db'),
+        'USER': config('DB_USER', default='tahfiz_user'),
+        'PASSWORD': config('DB_PASSWORD', default='tahfiz_password'),
+        'HOST': config('DB_HOST', default='db'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 
-
+# SQLite for local development (uncomment if needed)
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# MySQL for VPS (uncomment if needed)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'cl17008_ksta7',
+#         'USER': 'cl17008_ksta7',
+#         'PASSWORD': 'Knyaz999',
+#         'HOST': 'localhost',
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+#         },
+#         'PORT': '3306',
 #     }
 # }
 
@@ -136,5 +131,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'user.User'
 
+# Login URLs
+LOGIN_URL = 'user:login'
+LOGIN_REDIRECT_URL = 'dashboard:dashboard'
+LOGOUT_REDIRECT_URL = 'user:login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

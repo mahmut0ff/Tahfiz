@@ -12,6 +12,7 @@ class SubjectForm(forms.ModelForm):
                 'class': 'form-control',
                 'type': 'text',
                 'id': 'name',
+                'placeholder': 'Название предмета...'
             }),
 
         }

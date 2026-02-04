@@ -10,8 +10,7 @@
                 <div class="col-md-4 gap-2">
                     <ol class="list-group list-group-numbered">
                         {% for lesson in lessons %}
-                        <li class="list-group-item"><a href="{% url 'lesson-detail' group.id lesson.id %}?group_id={{ group.id }}"><strong
-                                    class="text-dark">{{ lesson.title }}</strong></a></li>
+                        <li class="list-group-item"><span class="text-dark">{{ lesson.title }}</span></li>
                         {% endfor %}
                     </ol>
                 </div>

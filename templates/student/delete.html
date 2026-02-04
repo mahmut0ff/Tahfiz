@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Удалить студента{% endblock %}
+
+{% block content %}
+{% include 'includes/messages.html' %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1 text-danger">
+                                <i class="bx bx-user-x me-2"></i>
+                                Удаление студента
+                            </h4>
+                            <p class="text-muted mb-0">Подтверждение удаления учащегося из системы</p>
+                        </div>
+                        <a href="{% url 'student:list' %}" class="btn btn-outline-secondary">
+                            <i class="bx bx-arrow-back me-1"></i>Назад к списку
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation -->
+    <div class="row">
+        <div class="col-xl-6 col-lg-8 mx-auto">
+            <div class="card border-danger">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="bx bx-error-circle bx-lg text-danger mb-3" style="font-size: 4rem;"></i>
+                        <h4 class="text-danger mb-3">Внимание!</h4>
+                        <h6 class="mb-3">Вы действительно хотите удалить студента?</h6>
+                    </div>
+
+                    <!-- Student Info -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-center mb-3">
+                                {% if student.image %}
+                                    <img src="{{ student.image.url }}" 
+                                         alt="{{ student.name }}" 
+                                         class="rounded-circle me-3" 
+                                         width="60" height="60">
+                                {% else %}
+                                    <img src="{% static 'assets/img/user_default.jpg' %}" 
+                                         alt="{{ student.name }}" 
+                                         class="rounded-circle me-3" 
+                                         width="60" height="60">
+                                {% endif %}
+                                <div class="text-start">
+                                    <h6 class="mb-1">{{ student.name }}</h6>
+                                    <small class="text-muted">{{ student.phone|default:"Телефон не указан" }}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <small class="text-muted">Курс</small>
+                                    <p class="mb-0 fw-medium">{{ student.course.title|default:"Не указан" }}</p>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted">Групп</small>
+                                    <p class="mb-0 fw-medium">{{ student.group.count }}</p>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted">Статус</small>
+                                    <p class="mb-0">
+                                        {% if student.student_status == 'active' %}
+                                            <span class="badge bg-success">Активный</span>
+                                        {% elif student.student_status == 'graduated' %}
+                                            <span class="badge bg-warning">Выпускник</span>
+                                        {% elif student.student_status == 'expelled' %}
+                                            <span class="badge bg-danger">Исключен</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Неактивный</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <i class="bx bx-error-circle me-2"></i>
+                        <strong>Это действие нельзя отменить!</strong><br>
+                        Все данные студента, включая оценки и посещаемость, будут удалены навсегда.
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'student:list' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bx bx-x me-1"></i>Отмена
+                        </a>
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bx bx-trash me-1"></i>Удалить студента
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card.border-danger {
+    border-width: 2px;
+}
+
+.alert-danger {
+    border-left: 4px solid #dc3545;
+}
+</style>
+{% endblock %}

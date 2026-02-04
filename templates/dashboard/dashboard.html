@@ -1,208 +1,167 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<div class="container-fluid">
+<div class="">
+    <!-- Статистические карточки -->
+    <div class="row mb-4">
+        <div class="col-12 col-md-6 col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="fw-semibold d-block mb-1">Студенты</span>
+                            <h3 class="card-title mb-2">{{ total_students }}</h3>
+                        </div>
+                        <div class="avatar flex-shrink-0">
+                            <span class="avatar-initial rounded bg-label-primary">
+                                <i class="bx bx-user bx-sm"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="fw-semibold d-block mb-1">Преподаватели</span>
+                            <h3 class="card-title mb-2">{{ total_teachers }}</h3>
+                        </div>
+                        <div class="avatar flex-shrink-0">
+                            <span class="avatar-initial rounded bg-label-success">
+                                <i class="bx bx-user-rectangle bx-sm"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="fw-semibold d-block mb-1">Группы</span>
+                            <h3 class="card-title mb-2">{{ total_groups }}</h3>
+                        </div>
+                        <div class="avatar flex-shrink-0">
+                            <span class="avatar-initial rounded bg-label-info">
+                                <i class="bx bx-group bx-sm"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="fw-semibold d-block mb-1">Выпускники</span>
+                            <h3 class="card-title mb-2">{{ total_graduates }}</h3>
+                        </div>
+                        <div class="avatar flex-shrink-0">
+                            <span class="avatar-initial rounded bg-label-warning">
+                                <i class="bx bx-medal bx-sm"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Финансовые карточки -->
     <div class="row mb-3">
         <div class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="card">
-                <div class="card-body">
+            <div class="card" style='background-image: url({% static "assets/Group 1.png" %});background-size: cover; background-position: center;'>
+                <div class="card-body py-4">
                     <div class="d-flex justify-content-between">
                         <div class="card-info">
-                            <p class="text-heading mb-1">Ожидаемая прибыль</p>
+                            <p class=" text-white mb-1">Ожидаемая прибыль</p>
                             <div class="d-flex align-items-center mb-1">
-                                <h4 class="card-title mb-0 me-2">{{ expected_profit }}</h4>
+                                <h2 class="fw-bold text-white mb-0 me-2">{{ expected_profit }} сом</h2>
                             </div>
-                            <span>Текущий месяц</span>
+                            <a href="{% url 'student:list' %}" style='background-color: #000; border-radius: 23px; padding:4px 10px;' class='text-white d-flex gap-3 align-items-center fw-bold mt-4'>
+                                Подробнее <span class='bg-white' style='border-radius:50%; padding: 2px 4px; '><i class='bx bx-right-arrow-alt text-dark'></i></span>
+                            </a>
                         </div>
-                        <div class="card-icon">
-                            <span class="badge bg-label-primary rounded p-2">
-                                <i class="bx bx-trending-up bx-lg"></i>
-                            </span>
-                        </div>
+                       
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="card">
+            <div class="card" style='background-image: url({% static "assets/Group 3.png" %});background-size: cover; background-position: center;'>
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div class="card-info">
-                            <p class="text-heading mb-1">Оплачено</p>
+                            <p class="text-white mb-1">Оплачено</p>
                             <div class="d-flex align-items-center mb-1">
-                                <h4 class="card-title mb-0 me-2">{{ transactions_amount }}</h4>
+                                <h2 class="fw-bold text-white mb-0 me-2">{{ transactions_amount }} сом</h2>
                             </div>
-                            <span>Текущий месяц</span>
+                            <a href="{% url 'student:list' %}" style='background-color: #000; border-radius: 23px; padding:4px 10px;' class='text-white d-flex gap-3 align-items-center fw-bold mt-4'>
+                                Подробнее <span class='bg-white' style='border-radius:50%; padding: 2px 4px; '><i class='bx bx-right-arrow-alt text-dark'></i></span>
+                            </a>
                         </div>
-                        <div class="card-icon">
-                            <span class="badge bg-label-success rounded p-2">
-                                <i class='bx bx-chevrons-up bx-lg'></i>
-                            </span>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="card">
+            <div class="card" style='background-image: url({% static "assets/Group 2.png" %});background-size: cover; background-position: center;'>
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div class="card-danger">
-                            <p class="text-heading mb-1">Не оплачено</p>
+                            <p class="text-white mb-1">Не оплачено</p>
                             <div class="d-flex align-items-center mb-1">
-                                <h4 class="card-title mb-0 me-2">{{ remainder }}</h4>
+                                <h2 class="fw-bold text-white mb-0 me-2">{{ remainder }} сом</h2>
                             </div>
-                            <span>Текущий месяц</span>
+                            <a href="{% url 'student:list' %}" style='background-color: #000; border-radius: 23px; padding:4px 10px;' class='text-white d-flex gap-3 align-items-center fw-bold mt-4'>
+                                Подробнее <span class='bg-white' style='border-radius:50%; padding: 2px 4px; '><i class='bx bx-right-arrow-alt text-dark'></i></span>
+                            </a>
                         </div>
-                        <div class="card-icon">
-                            <span class="badge bg-label-danger rounded p-2">
-                                <i class='bx bx-info-circle bx-lg'></i>
-                            </span>
-                        </div>
+                    
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mb-3">
+    <!-- Быстрые действия -->
+    <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-widget-separator-wrapper">
-                    <div class="card-body card-widget-separator">
-                        <div class="row gy-4 gy-sm-1">
-                            <div class="col-12 col-sm-6 col-lg-3">
-                                <div
-                                    class="d-flex justify-content-between align-items-center card-widget-1 border-end pb-4 pb-sm-0">
-                                    <div>
-                                        <h4 class="mb-0">{{ course_count }}</h4>
-                                        <p class="mb-0">Курсов</p>
-                                    </div>
-                                    <div class="avatar me-sm-6">
-                                        <span class="avatar-initial rounded bg-label-secondary text-heading">
-                                            <i class='bx bxl-discourse bx-26px'></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <hr class="d-none d-sm-block d-lg-none me-6">
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-3">
-                                <div
-                                    class="d-flex justify-content-between align-items-center card-widget-2 border-end pb-4 pb-sm-0">
-                                    <div>
-                                        <h4 class="mb-0">{{ group_count }}</h4>
-                                        <p class="mb-0">Групп</p>
-                                    </div>
-                                    <div class="avatar me-lg-6">
-                                        <span class="avatar-initial rounded bg-label-secondary text-heading">
-                                            <i class="bx bx-group bx-26px"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <hr class="d-none d-sm-block d-lg-none">
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-3">
-                                <div
-                                    class="d-flex justify-content-between align-items-center border-end pb-4 pb-sm-0 card-widget-3">
-                                    <div>
-                                        <h4 class="mb-0">{{ student_count }}</h4>
-                                        <p class="mb-0">Студентов</p>
-                                    </div>
-                                    <div class="avatar me-sm-6">
-                                        <span class="avatar-initial rounded bg-label-secondary text-heading">
-                                            <i class='bx bx-child bx-26px'></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h4 class="mb-0">{{ teacher_count }}</h4>
-                                        <p class="mb-0">Преподавателей</p>
-                                    </div>
-                                    <div class="avatar">
-                                        <span class="avatar-initial rounded bg-label-secondary text-heading">
-                                            <i class='bx bxs-graduation bx-26px'></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Быстрые действия</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'student:create' %}" class="btn btn-primary w-100">
+                                <i class="bx bx-plus me-1"></i>Добавить студента
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'teacher:create' %}" class="btn btn-success w-100">
+                                <i class="bx bx-plus me-1"></i>Добавить преподавателя
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'group:create' %}" class="btn btn-info w-100">
+                                <i class="bx bx-plus me-1"></i>Создать группу
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'schedule:subject_create' %}" class="btn btn-warning w-100">
+                                <i class="bx bx-plus me-1"></i>Добавить предмет
+                            </a>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12 col-md-6 mb-4">
-            <div class="card border-secondary">
-                <div class="card-header d-flex align-items-center gap-2 justify-content-between">
-                    <div class="d-flex gap-3 align-items-center">
-                        <span class="badge bg-label-success rounded p-2">
-                            <i class='bx bxs-report bx-sm'></i>
-                        </span>
-                        <span class="card-title mb-0 fs-5">5 последних оплат</span>
-                    </div>
-                    <a href="{% url 'transaction-list' %}" class="mb-0 justify-content-end">Подробнее</a>
-                </div>
-                <div class="card-body">
-
-                    <ul class="p-0 m-0">
-                        {% for transaction in last_five_transactions %}
-                        <li class="d-flex align-items-center mb-2 gap-3">
-                            <span class="badge bg-label-success rounded p-2">
-                                <i class='bx bx-chevrons-up bx-sm'></i>
-                            </span>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <small class="d-block">{{ transaction.course }}</small>
-                                    <h6 class="fw-normal mb-0">{{ transaction.student.name }}</h6>
-                                </div>
-                                <div class="user-progress d-flex align-items-center gap-2">
-                                    <h6 class="fw-normal mb-0">+{{ transaction.amount }}</h6>
-                                    <span class="text-muted">СОМ</span>
-                                </div>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 mb-4">
-            <div class="card border-secondary">
-                <div class="card-header d-flex align-items-center gap-2 justify-content-between">
-                    <div class="d-flex gap-3 align-items-center">
-                        <span class="badge bg-label-info rounded p-2">
-                            <i class='bx bx-wallet bx-sm'></i>
-                        </span>
-                        <span class="card-title mb-0 fs-5">Выдачи зарплат</span>
-                    </div>
-                    <a href="{% url 'salary-list' %}" class="mb-0 justify-content-end">Подробнее</a>
-                </div>
-                <div class="card-body">
-                    <ul class="p-0 m-0">
-                        {% for salary in last_five_salaries %}
-                        <li class="d-flex align-items-center mb-2 gap-3">
-                            <span class="badge bg-label-info rounded p-2">
-                                <i class='bx bx-money-withdraw bx-sm'></i>
-                            </span>
-                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                <div class="me-2">
-                                    <small class="d-block">+{{ salary.teacher.phone }}</small>
-                                    <h6 class="fw-normal mb-0">{{ salary.teacher.name }}</h6>
-                                </div>
-                                <div class="user-progress d-flex align-items-center gap-2">
-                                    <h6 class="fw-normal mb-0">{{ salary.amount }}</h6>
-                                    <span class="text-muted">СОМ</span>
-                                </div>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
                 </div>
             </div>
         </div>

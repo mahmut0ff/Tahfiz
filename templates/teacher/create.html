@@ -1,63 +1,211 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Создать преподавателя{% endblock %}
+
 {% block content %}
 {% include 'includes/messages.html' %}
-<div class="row">
-  <div class="col-6 mx-auto">
-    <div class="card mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Создать преподавателя</h5>
-      </div>
-      <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label class="form-label" for="basic-default-fullname">Изображение</label>
-            {{ form.image }}
-        </div>
-          <div class="mb-3">
-            <label class="form-label" for="basic-default-fullname">Имя</label>
-            {{ form.name }}
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="basic-default-fullname">Номер</label>
-            {{ form.phone }}
-          </div>
-          <div class="mb-3">
-            <div class="accordion-item card p-3">
-              <h2 class="accordion-header text-body d-flex justify-content-between" id="accordionIconOne">
-                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                  data-bs-target="#accordionIcon-1" aria-controls="accordionIcon-1" aria-expanded="false">
-                  Предметы
-                </button>
-              </h2>
-              <div id="accordionIcon-1" class="accordion-collapse collapse" data-bs-parent="#accordionIcon" style="">
-                <div class="accordion-body">
-                  {{ form.subjects }}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mb-3">
-            <div class="accordion-item card p-3">
-              <h2 class="accordion-header text-body d-flex justify-content-between" id="accordionIconOne">
-                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                  data-bs-target="#accordionIcon-2" aria-controls="accordionIcon-2" aria-expanded="false">
-                  Группы
-                </button>
-              </h2>
-              <div id="accordionIcon-2" class="accordion-collapse collapse" data-bs-parent="#accordionIcon" style="">
-                <div class="accordion-body">
-                  {{ form.group }}
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <button type="submit" class="btn btn-primary">Создать</button>
-        </form>
-      </div>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bx bx-user-plus me-2 text-warning"></i>
+                                Создать преподавателя
+                            </h4>
+                            <p class="text-muted mb-0">Добавление нового преподавателя в систему</p>
+                        </div>
+                        <a href="{% url 'teacher:list' %}" class="btn btn-outline-secondary">
+                            <i class="bx bx-arrow-back me-1"></i>Назад к списку
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Form -->
+    <div class="row">
+        <div class="col-xl-8 col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="card-title mb-3">
+                                    <i class="bx bx-user me-2 text-primary"></i>
+                                    Личная информация
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Фотография преподавателя</label>
+                                    <div class="d-flex align-items-start align-items-sm-center gap-4">
+                                        <img src="{% static 'assets/img/user_default.jpg' %}" alt="teacher-avatar" class="d-block rounded" height="100" width="100" id="uploadedAvatar">
+                                        <div class="button-wrapper">
+                                            {{ form.image }}
+                                            <p class="text-muted mb-0">Разрешены JPG, GIF или PNG. Максимальный размер 800K</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="name">
+                                            <i class="bx bx-user me-1"></i>Полное имя *
+                                        </label>
+                                        {{ form.name }}
+                                        <div class="invalid-feedback">Пожалуйста, введите имя преподавателя</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="phone">
+                                            <i class="bx bx-phone me-1"></i>Номер телефона
+                                        </label>
+                                        {{ form.phone }}
+                                        <div class="form-text">Формат: +996 XXX XXX XXX</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Academic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="card-title mb-3">
+                                    <i class="bx bx-book me-2 text-success"></i>
+                                    Преподавательская деятельность
+                                </h5>
+                            </div>
+                        </div>
+
+                        <!-- Subjects Selection -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="bx bx-book-bookmark me-2 text-info"></i>
+                                            Предметы
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted mb-3">Выберите предметы, которые будет преподавать учитель</p>
+                                        {{ form.subjects }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="bx bx-group me-2 text-warning"></i>
+                                            Группы
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted mb-3">Выберите группы, в которых будет преподавать учитель</p>
+                                        {{ form.group }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-3">
+                                    <a href="{% url 'teacher:list' %}" class="btn btn-outline-secondary">
+                                        <i class="bx bx-x me-1"></i>Отмена
+                                    </a>
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="bx bx-check me-1"></i>Создать преподавателя
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<style>
+.needs-validation .form-control:invalid {
+    border-color: #dc3545;
+}
+
+.needs-validation .form-control:valid {
+    border-color: #28a745;
+}
+
+.card-title {
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+}
+
+.button-wrapper input[type=file] {
+    position: absolute;
+    left: -9999px;
+}
+
+.button-wrapper label {
+    cursor: pointer;
+    display: inline-block;
+    padding: 8px 16px;
+    background: #ffab00;
+    color: white;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.button-wrapper label:hover {
+    background: #e69500;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // Image preview
+    const imageInput = document.querySelector('input[type="file"]');
+    const imagePreview = document.getElementById('uploadedAvatar');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

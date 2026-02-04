@@ -1,110 +1,492 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
+
+{% block title %}Журнал - {{ group.title }}: {{ subject.name }}{% endblock %}
+
 {% block content %}
+{% include 'includes/messages.html' %}
 
-<div class="row justify-content-between mb-3">
-    <div class="col-md-6">
-        <span class="fs-3 fw-bold">Журнал {{ group.title }} - "{{ subject }}"</span>
-    </div>
-
-    <div class="col-md-6 text-md-end">
-        <form method="get" class="mb-4">
-            <div class="row g-2 justify-content-md-end align-items-center">
-                <div class="col-auto">
-                    <input type="month" name="month" value='{{ date }}' class="form-control">
-                </div>
-
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Показать</button>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <nav aria-label="breadcrumb" class="mb-2">
+                                <ol class="breadcrumb mb-0">
+                                    <li class="breadcrumb-item">
+                                        <a href="{% url 'grade:group_list' %}">
+                                            <i class="bx bx-book-open me-1"></i>Журнал
+                                        </a>
+                                    </li>
+                                    <li class="breadcrumb-item">
+                                        <a href="{% url 'grade:subject_list' group.id %}">{{ group.title }}</a>
+                                    </li>
+                                    <li class="breadcrumb-item active">{{ subject.name }}</li>
+                                </ol>
+                            </nav>
+                            <h4 class="mb-1">
+                                <i class="bx bx-edit me-2 text-primary"></i>
+                                {{ group.title }}: {{ subject.name }}
+                            </h4>
+                            <p class="text-muted mb-0">
+                                <i class="bx bx-user me-1"></i>{{ students_data|length }} студентов
+                                <span class="mx-2">•</span>
+                                <i class="bx bx-calendar me-1"></i>{{ dates|length }} дней с оценками
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-md-end gap-2">
+                                <form method="get" class="d-flex">
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bx bx-calendar"></i>
+                                        </span>
+                                        <input type="month" 
+                                               name="month" 
+                                               value="{{ date_filter }}" 
+                                               class="form-control">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bx bx-search"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                                {% if can_edit %}
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addGradeModal">
+                                    <i class="bx bx-plus me-1"></i>Добавить оценку
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </form>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-primary">
+                            <i class="bx bx-group bx-sm"></i>
+                        </span>
+                    </div>
+                    <h5 class="mb-1">{{ students_data|length }}</h5>
+                    <small class="text-muted">Студентов</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-success">
+                            <i class="bx bx-star bx-sm"></i>
+                        </span>
+                    </div>
+                    <h5 class="mb-1">{{ total_grades }}</h5>
+                    <small class="text-muted">Всего оценок</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-info">
+                            <i class="bx bx-trending-up bx-sm"></i>
+                        </span>
+                    </div>
+                    <h5 class="mb-1">{{ class_average }}</h5>
+                    <small class="text-muted">Средний балл класса</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-warning">
+                            <i class="bx bx-trophy bx-sm"></i>
+                        </span>
+                    </div>
+                    <h5 class="mb-1">{{ best_average }}</h5>
+                    <small class="text-muted">Лучший результат</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grades Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bx bx-table me-2"></i>Журнал оценок
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3">{{ current_month }}</small>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary active" onclick="showTable()">
+                                <i class="bx bx-table"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="showCards()">
+                                <i class="bx bx-grid-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Table View -->
+                    <div id="tableView" class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sticky-col" style="min-width: 200px;">
+                                        <i class="bx bx-user me-1"></i>Студент
+                                    </th>
+                                    {% for date in dates %}
+                                    <th class="text-center" style="min-width: 80px;">
+                                        <small>{{ date|date:"d.m" }}</small>
+                                    </th>
+                                    {% endfor %}
+                                    <th class="text-center bg-light" style="min-width: 100px;">
+                                        <i class="bx bx-calculator me-1"></i>Средний
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student_data in students_data %}
+                                <tr>
+                                    <td class="sticky-col bg-light">
+                                        <div class="d-flex align-items-center">
+                                            {% if student_data.student.image %}
+                                                <img src="{{ student_data.student.image.url }}" 
+                                                     alt="{{ student_data.student.name }}" 
+                                                     class="rounded-circle me-2" 
+                                                     width="32" height="32">
+                                            {% else %}
+                                                <div class="avatar avatar-sm me-2">
+                                                    <span class="avatar-initial rounded-circle bg-label-primary">
+                                                        {{ student_data.student.name|first|upper }}
+                                                    </span>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <div class="fw-semibold">{{ student_data.student.name }}</div>
+                                                <small class="text-muted">ID: {{ student_data.student.id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    {% for date in dates %}
+                                    <td class="text-center">
+                                        {% for grade in student_data.grades_by_date|get_item:date %}
+                                            <span class="badge bg-{% if grade.mark >= 4.5 %}success{% elif grade.mark >= 3.5 %}warning{% else %}danger{% endif %} me-1 grade-badge" 
+                                                  data-bs-toggle="tooltip" 
+                                                  title="Преподаватель: {% if grade.teacher %}{{ grade.teacher.name }}{% else %}Неизвестно{% endif %}{% if grade.pages %}, Страниц: {{ grade.pages }}{% endif %}"
+                                                  {% if can_edit %}onclick="deleteGrade({{ grade.id }})"{% endif %}>
+                                                {{ grade.mark }}
+                                                {% if can_edit %}
+                                                    <i class="bx bx-x bx-xs ms-1 delete-icon"></i>
+                                                {% endif %}
+                                            </span>
+                                        {% endfor %}
+                                    </td>
+                                    {% endfor %}
+                                    <td class="text-center bg-light">
+                                        <span class="badge bg-{% if student_data.average >= 4.5 %}success{% elif student_data.average >= 3.5 %}warning{% else %}danger{% endif %} fs-6">
+                                            {{ student_data.average }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="{{ dates|length|add:2 }}" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="bx bx-user-x bx-lg mb-2"></i>
+                                            <p>Студенты не найдены</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Card View -->
+                    <div id="cardView" class="d-none p-3">
+                        <div class="row">
+                            {% for student_data in students_data %}
+                            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                                <div class="card student-card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            {% if student_data.student.image %}
+                                                <img src="{{ student_data.student.image.url }}" 
+                                                     alt="{{ student_data.student.name }}" 
+                                                     class="rounded-circle me-3" 
+                                                     width="48" height="48">
+                                            {% else %}
+                                                <div class="avatar me-3">
+                                                    <span class="avatar-initial rounded-circle bg-label-primary">
+                                                        {{ student_data.student.name|first|upper }}
+                                                    </span>
+                                                </div>
+                                            {% endif %}
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">{{ student_data.student.name }}</h6>
+                                                <small class="text-muted">ID: {{ student_data.student.id }}</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-{% if student_data.average >= 4.5 %}success{% elif student_data.average >= 3.5 %}warning{% else %}danger{% endif %}">
+                                                    {{ student_data.average }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="grades-container">
+                                            {% for date in dates %}
+                                                {% for grade in student_data.grades_by_date|get_item:date %}
+                                                    <span class="badge bg-{% if grade.mark >= 4.5 %}success{% elif grade.mark >= 3.5 %}warning{% else %}danger{% endif %} me-1 mb-1">
+                                                        {{ grade.mark }} ({{ date|date:"d.m" }})
+                                                    </span>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </div>
+                                        
+                                        {% if can_edit %}
+                                        <div class="mt-3">
+                                            <button class="btn btn-sm btn-outline-primary w-100" 
+                                                    onclick="openAddGradeModal({{ student_data.student.id }}, '{{ student_data.student.name }}')">
+                                                <i class="bx bx-plus me-1"></i>Добавить оценку
+                                            </button>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th style="width: 5%;">№</th>
-            <th style="width: 35%;">Студент</th>
-            {% for day in days %}
-                <th style="width: 5%;" class='text-center'>{{ day|date:"d" }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-    {% for student in students %}
-    <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>
-            <div class="text-start">
-                <span data-bs-toggle="modal" data-bs-target="#modalCenter{{student.id}}" class="fw-bold text-primary" style="cursor: pointer;">
-                    {{ student.name }}
-                </span>
+<!-- Add Grade Modal -->
+{% if can_edit %}
+<div class="modal fade" id="addGradeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bx bx-plus me-2"></i>Добавить оценку
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        </td>
-        {% for day in days %}
-        <td class='text-center'>
-            {% with student.grade_set.all as grades %}
-                {% for grade in grades %}
-                    {% if grade.subject == subject and grade.date == day %}
-                        <span type="button" class="" data-bs-toggle="modal" data-bs-target="#basicModal{{ grade.id }}">
-                            {{ grade.mark }}
-                        </span>
-                        <div class="modal fade" id="basicModal{{ grade.id }}" tabindex="-1" aria-hidden="true" style="display: none;">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel1">Удаление оценки</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+            <form id="addGradeForm" method="post">
                 <div class="modal-body">
-                  <p>Вы действительно желаете удалить эту оценку?</p>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Студент</label>
+                            <select name="student_id" class="form-select" required>
+                                <option value="">Выберите студента</option>
+                                {% for student_data in students_data %}
+                                <option value="{{ student_data.student.id }}">{{ student_data.student.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Оценка</label>
+                            <select name="mark" class="form-select" required>
+                                <option value="">Выберите оценку</option>
+                                <option value="5">5 - Отлично</option>
+                                <option value="4">4 - Хорошо</option>
+                                <option value="3">3 - Удовлетворительно</option>
+                                <option value="2">2 - Неудовлетворительно</option>
+                                <option value="1">1 - Очень плохо</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Дата</label>
+                            <input type="date" name="date" class="form-control" 
+                                   value="{{ today|date:'Y-m-d' }}" 
+                                   required>
+                            <small class="text-muted">Можно указать дату в пределах 3 дней от сегодня</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Страницы (необязательно)</label>
+                            <input type="number" name="pages" class="form-control" 
+                                   min="0" max="1000" value="0">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
-                  <a href="{% url 'grade-delete' group.id subject.id grade.id %}" class="btn btn-danger">Удалить</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bx bx-x me-1"></i>Отмена
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-check me-1"></i>Добавить оценку
+                    </button>
                 </div>
-              </div>
-            </div>
-          </div>
-                    {% endif %}
-                {% endfor %}
-            {% if not grades %}
-                <div>—</div>
-            {% endif %}
-            {% endwith %}
-        </td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-
-
-
-{% for student in students %}
-<div class="modal fade" id="modalCenter{{student.id}}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <form method="POST" class="modal-content">
-            {% csrf_token %}
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalCenterTitle">Оценка для {{ student.name }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="student_id" value="{{ student.id }}">
-                <input class="form-control mb-3" name="mark" type='number' placeholder="Укажите оценку" required/>
-                <input class="form-control mb-3" name="pages" type='number' placeholder="Укажите кол-во страниц(не обязательно)"/>
-                <input type="date" name="date" placeholder="Укажите дату" class="form-control" required>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="submit" class="btn btn-primary">Готово</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
-{% endfor %}
+{% endif %}
 
+<style>
+.sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: white;
+    border-right: 2px solid #e7eaf3;
+}
+
+.grade-badge {
+    cursor: {% if can_edit %}pointer{% else %}default{% endif %};
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+{% if can_edit %}
+.grade-badge:hover {
+    transform: scale(1.1);
+}
+
+.delete-icon {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.grade-badge:hover .delete-icon {
+    opacity: 1;
+}
+{% endif %}
+
+.student-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.student-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 25px 0 rgba(105, 108, 255, 0.1);
+}
+
+.grades-container {
+    min-height: 60px;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+}
+
+.avatar-sm .avatar-initial {
+    font-size: 0.75rem;
+}
+</style>
+
+<script>
+// View switching
+function showTable() {
+    document.getElementById('tableView').classList.remove('d-none');
+    document.getElementById('cardView').classList.add('d-none');
+    document.querySelector('[onclick="showTable()"]').classList.add('active');
+    document.querySelector('[onclick="showCards()"]').classList.remove('active');
+}
+
+function showCards() {
+    document.getElementById('tableView').classList.add('d-none');
+    document.getElementById('cardView').classList.remove('d-none');
+    document.querySelector('[onclick="showCards()"]').classList.add('active');
+    document.querySelector('[onclick="showTable()"]').classList.remove('active');
+}
+
+// Open modal for specific student
+function openAddGradeModal(studentId, studentName) {
+    const modal = new bootstrap.Modal(document.getElementById('addGradeModal'));
+    document.querySelector('[name="student_id"]').value = studentId;
+    modal.show();
+}
+
+{% if can_edit %}
+// Delete grade function
+function deleteGrade(gradeId) {
+    if (confirm('Удалить эту оценку?')) {
+        fetch(`{% url 'grade:delete' group.id subject.id 0 %}`.replace('0', gradeId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Ошибка: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Произошла ошибка при удалении оценки');
+        });
+    }
+}
+
+// AJAX form submission
+document.getElementById('addGradeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('addGradeModal')).hide();
+            location.reload();
+        } else {
+            alert('Ошибка: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Произошла ошибка при добавлении оценки');
+    });
+});
+{% endif %}
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
 {% endblock %}

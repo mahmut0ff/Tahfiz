@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Выпускники{% endblock %}
+
+{% block content %}
+{% include 'includes/messages.html' %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bx bx-graduation me-2 text-success"></i>
+                                Выпускники медресе
+                            </h4>
+                            <p class="text-muted mb-0">Список всех выпускников учебного заведения</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-label-success me-2">
+                                <i class="bx bx-user-check me-1"></i>
+                                {{ graduates|length }} выпускников
+                            </span>
+                            <a href="{% url 'graduate:create' %}" class="btn btn-success">
+                                <i class="bx bx-plus me-1"></i>Добавить выпускника
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Поиск</label>
+                            <input type="text" name="search" class="form-control" 
+                                   placeholder="Поиск по имени или номеру диплома..." 
+                                   value="{{ search_query }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Год выпуска</label>
+                            <select name="year" class="form-control">
+                                <option value="">Все годы</option>
+                                {% for year in years %}
+                                    <option value="{{ year }}" {% if year_filter == year|stringformat:"s" %}selected{% endif %}>
+                                        {{ year }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Группа</label>
+                            <select name="group" class="form-control">
+                                <option value="">Все группы</option>
+                                {% for group in groups %}
+                                    <option value="{{ group.id }}" {% if group_filter == group.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ group.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100 d-block">
+                                <i class="bx bx-search me-1"></i>Фильтр
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graduates Grid -->
+    <div class="row">
+        {% for graduate in page_obj %}
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+            <div class="card h-100 graduate-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar me-3">
+                                {% if graduate.student.image %}
+                                    <img src="{{ graduate.student.image.url }}" 
+                                         alt="{{ graduate.full_name }}" 
+                                         class="rounded-circle" 
+                                         width="40" height="40">
+                                {% else %}
+                                    <img src="{% static 'assets/img/user_default.jpg' %}" 
+                                         alt="{{ graduate.full_name }}" 
+                                         class="rounded-circle" 
+                                         width="40" height="40">
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ graduate.full_name }}</h6>
+                                <small class="text-muted">{{ graduate.graduation_date|date:"d.m.Y" }}</small>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn p-0" type="button" data-bs-toggle="dropdown">
+                                <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'graduate:detail' graduate.pk %}">
+                                    <i class="bx bx-show me-2"></i>Просмотр
+                                </a>
+                                <a class="dropdown-item" href="{% url 'graduate:update' graduate.pk %}">
+                                    <i class="bx bx-edit-alt me-2"></i>Редактировать
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="{% url 'graduate:delete' graduate.pk %}">
+                                    <i class="bx bx-trash me-2"></i>Удалить
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {% if graduate.graduation_group %}
+                            <p class="text-muted mb-2">
+                                <i class="bx bx-group me-1"></i>
+                                {{ graduate.graduation_group.title }}
+                            </p>
+                        {% endif %}
+                        
+                        {% if graduate.final_grade %}
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bx bx-medal me-2 text-warning"></i>
+                                <span class="fw-semibold">Итоговая оценка:</span>
+                                <span class="badge bg-label-success ms-2">{{ graduate.final_grade }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if graduate.diploma_number %}
+                            <p class="text-muted mb-2">
+                                <i class="bx bx-certification me-1"></i>
+                                Диплом № {{ graduate.diploma_number }}
+                            </p>
+                        {% endif %}
+                        
+                        {% if graduate.current_occupation %}
+                            <p class="text-muted mb-0">
+                                <i class="bx bx-briefcase me-1"></i>
+                                {{ graduate.current_occupation|truncatechars:40 }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid">
+                        <a href="{% url 'graduate:detail' graduate.pk %}" class="btn btn-success">
+                            <i class="bx bx-show me-1"></i>
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-3">
+                        <i class="bx bx-graduation bx-lg text-muted"></i>
+                    </div>
+                    <h5 class="text-muted">Выпускники не найдены</h5>
+                    <p class="text-muted mb-4">В системе пока нет зарегистрированных выпускников.</p>
+                    <a href="{% url 'graduate:create' %}" class="btn btn-success">
+                        <i class="bx bx-plus me-1"></i>Добавить выпускника
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if page_obj.has_other_pages %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if year_filter %}&year={{ year_filter }}{% endif %}{% if group_filter %}&group={{ group_filter }}{% endif %}">
+                                <i class="bx bx-chevron-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if year_filter %}&year={{ year_filter }}{% endif %}{% if group_filter %}&group={{ group_filter }}{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if year_filter %}&year={{ year_filter }}{% endif %}{% if group_filter %}&group={{ group_filter }}{% endif %}">
+                                <i class="bx bx-chevron-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.graduate-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e7eaf3;
+}
+
+.graduate-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 25px 0 rgba(40, 199, 111, 0.1);
+}
+
+.avatar img {
+    object-fit: cover;
+}
+</style>
+{% endblock %}

@@ -1,51 +1,283 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Создать студента{% endblock %}
+
 {% block content %}
 {% include 'includes/messages.html' %}
-<div class="row">
-    <div class="col-6 mx-auto">
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Создать ученика</h5>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bx bx-user-plus me-2 text-info"></i>
+                                Создать студента
+                            </h4>
+                            <p class="text-muted mb-0">Добавление нового учащегося в систему</p>
+                        </div>
+                        <a href="{% url 'student:list' %}" class="btn btn-outline-secondary">
+                            <i class="bx bx-arrow-back me-1"></i>Назад к списку
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label" for="basic-default-fullname">Изображение</label>
-                        {{ form.image }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="basic-default-fullname">Имя</label>
-                        {{ form.name }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="basic-default-fullname">Номер</label>
-                        {{ form.phone }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="basic-default-fullname">К оплате</label>
-                        {{ form.to_pay }}
-                    </div>
-                    <div class="mb-3">
-                        <div class="accordion-item card p-3">
-                        <h2 class="accordion-header text-body d-flex justify-content-between" id="accordionIconOne">
-                            <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                            data-bs-target="#accordionIcon-2" aria-controls="accordionIcon-2" aria-expanded="false">
-                            Группы
-                            </button>
-                        </h2>
-                        <div id="accordionIcon-2" class="accordion-collapse collapse" data-bs-parent="#accordionIcon" style="">
-                            <div class="accordion-body">
-                            {{ form.group }}
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="row">
+        <div class="col-xl-8 col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="card-title mb-3">
+                                    <i class="bx bx-user me-2 text-primary"></i>
+                                    Личная информация
+                                </h5>
                             </div>
                         </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Фотография студента</label>
+                                    <div class="text-center">
+                                        <div class="avatar-upload-container" onclick="document.getElementById('{{ form.image.id_for_label }}').click();">
+                                            <img src="{% static 'assets/img/user_default.jpg' %}" alt="user-avatar" class="avatar-img" id="uploadedAvatar">
+                                            <div class="avatar-upload-overlay">
+                                                <i class="bx bx-camera"></i>
+                                                <div>Загрузить фото</div>
+                                            </div>
+                                        </div>
+                                        {{ form.image }}
+                                        <p class="text-muted mt-2 mb-0">Кликните для выбора изображения<br><small>JPG, PNG до 800KB</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="name">
+                                            <i class="bx bx-user me-1"></i>Полное имя *
+                                        </label>
+                                        {{ form.name }}
+                                        <div class="invalid-feedback">Пожалуйста, введите имя студента</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="phone">
+                                            <i class="bx bx-phone me-1"></i>Номер телефона
+                                        </label>
+                                        {{ form.phone }}
+                                        <div class="form-text">Формат: +996 XXX XXX XXX</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="student_status">
+                                            <i class="bx bx-user-check me-1"></i>Статус студента
+                                        </label>
+                                        {{ form.student_status }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label" for="status">
+                                            <i class="bx bx-check-circle me-1"></i>Статус обучения
+                                        </label>
+                                        <div class="form-check form-switch mt-2">
+                                            {{ form.status }}
+                                            <label class="form-check-label" for="status">
+                                                Активно обучается
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Создать</button>
-                </form>
+
+                        <!-- Academic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="card-title mb-3">
+                                    <i class="bx bx-book me-2 text-success"></i>
+                                    Учебная информация
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="course">
+                                    <i class="bx bx-book-bookmark me-1"></i>Курс обучения *
+                                </label>
+                                {{ form.course }}
+                                <div class="invalid-feedback">Пожалуйста, выберите курс</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="to_pay">
+                                    <i class="bx bx-money me-1"></i>Сумма к оплате (сом)
+                                </label>
+                                {{ form.to_pay }}
+                                <div class="form-text">Оставьте пустым, если оплата не требуется</div>
+                            </div>
+                        </div>
+
+                        <!-- Groups Selection -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="card-title mb-3">
+                                    <i class="bx bx-group me-2 text-warning"></i>
+                                    Группы
+                                </h5>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <p class="text-muted mb-3">Выберите группы, в которых будет обучаться студент</p>
+                                        {{ form.group }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-3">
+                                    <a href="{% url 'student:list' %}" class="btn btn-outline-secondary">
+                                        <i class="bx bx-x me-1"></i>Отмена
+                                    </a>
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="bx bx-check me-1"></i>Создать студента
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+.needs-validation .form-control:invalid {
+    border-color: #dc3545;
+}
+
+.needs-validation .form-control:valid {
+    border-color: #28a745;
+}
+
+.card-title {
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+}
+
+/* Avatar Upload Styles */
+.avatar-upload-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    cursor: pointer;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.avatar-upload-container:hover {
+    border-color: #007bff;
+    transform: scale(1.02);
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.avatar-upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 123, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.avatar-upload-container:hover .avatar-upload-overlay {
+    opacity: 1;
+}
+
+.avatar-upload-overlay i {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+/* Hide file input */
+input[type="file"] {
+    display: none;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // Image preview
+    const imageInput = document.querySelector('input[type="file"]');
+    const imagePreview = document.getElementById('uploadedAvatar');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Simple file validation
+                if (!file.type.startsWith('image/')) {
+                    alert('Пожалуйста, выберите изображение');
+                    return;
+                }
+                
+                if (file.size > 800 * 1024) {
+                    alert('Размер файла не должен превышать 800KB');
+                    return;
+                }
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

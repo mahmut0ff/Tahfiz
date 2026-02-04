@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ graduate.full_name }} - Выпускник{% endblock %}
+
+{% block content %}
+{% include 'includes/messages.html' %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+        <!-- Основная информация -->
+        <div class="col-xl-4 col-lg-5 col-md-5">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="user-avatar-section">
+                        <div class="d-flex align-items-center flex-column">
+                            {% if graduate.student.image %}
+                                <img class="img-fluid rounded my-4" 
+                                     src="{{ graduate.student.image.url }}" 
+                                     height="110" width="110" 
+                                     alt="{{ graduate.full_name }}">
+                            {% else %}
+                                <img class="img-fluid rounded my-4" 
+                                     src="{% static 'assets/img/user_default.jpg' %}" 
+                                     height="110" width="110" 
+                                     alt="{{ graduate.full_name }}">
+                            {% endif %}
+                            <div class="user-info text-center">
+                                <h4 class="mb-2">{{ graduate.full_name }}</h4>
+                                <span class="badge bg-label-success">Выпускник {{ graduate.graduation_year }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-around flex-wrap my-4 py-3">
+                        <div class="d-flex align-items-start me-4 mt-3 gap-3">
+                            <span class="badge bg-label-primary p-2 rounded">
+                                <i class="bx bx-check bx-sm"></i>
+                            </span>
+                            <div>
+                                <h5 class="mb-0">{{ achievements.count }}</h5>
+                                <span>Достижений</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start mt-3 gap-3">
+                            <span class="badge bg-label-primary p-2 rounded">
+                                <i class="bx bx-star bx-sm"></i>
+                            </span>
+                            <div>
+                                <h5 class="mb-0">
+                                    {% if graduate.final_grade %}
+                                        {{ graduate.final_grade }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </h5>
+                                <span>Итоговая оценка</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="pb-2 border-bottom mb-4">Детали</h5>
+                    <div class="info-container">
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <span class="fw-semibold me-2">Дата выпуска:</span>
+                                <span>{{ graduate.graduation_date|date:"d.m.Y" }}</span>
+                            </li>
+                            <li class="mb-3">
+                                <span class="fw-semibold me-2">Группа выпуска:</span>
+                                <span>
+                                    {% if graduate.graduation_group %}
+                                        {{ graduate.graduation_group.title }}
+                                    {% else %}
+                                        Не указана
+                                    {% endif %}
+                                </span>
+                            </li>
+                            <li class="mb-3">
+                                <span class="fw-semibold me-2">Номер диплома:</span>
+                                <span>
+                                    {% if graduate.diploma_number %}
+                                        {{ graduate.diploma_number }}
+                                    {% else %}
+                                        Не указан
+                                    {% endif %}
+                                </span>
+                            </li>
+                            <li class="mb-3">
+                                <span class="fw-semibold me-2">Телефон:</span>
+                                <span>
+                                    {% if graduate.contact_phone %}
+                                        {{ graduate.contact_phone }}
+                                    {% else %}
+                                        {{ graduate.student.phone }}
+                                    {% endif %}
+                                </span>
+                            </li>
+                            <li class="mb-3">
+                                <span class="fw-semibold me-2">Email:</span>
+                                <span>
+                                    {% if graduate.contact_email %}
+                                        {{ graduate.contact_email }}
+                                    {% else %}
+                                        Не указан
+                                    {% endif %}
+                                </span>
+                            </li>
+                        </ul>
+                        
+                        <div class="d-flex justify-content-center pt-3">
+                            <a href="{% url 'graduate:update' graduate.pk %}" class="btn btn-primary me-3">
+                                <i class="bx bx-edit-alt me-1"></i>Редактировать
+                            </a>
+                            <a href="{% url 'graduate:list' %}" class="btn btn-label-secondary">
+                                <i class="bx bx-arrow-back me-1"></i>Назад
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Дополнительная информация -->
+        <div class="col-xl-8 col-lg-7 col-md-7">
+            <!-- Текущая деятельность и достижения -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Информация о деятельности</h5>
+                </div>
+                <div class="card-body">
+                    {% if graduate.current_occupation %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Текущая деятельность</h6>
+                            <p>{{ graduate.current_occupation }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if graduate.achievements %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Достижения во время обучения</h6>
+                            <p>{{ graduate.achievements|linebreaks }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if graduate.notes %}
+                        <div class="mb-3">
+                            <h6 class="text-muted">Примечания</h6>
+                            <p>{{ graduate.notes|linebreaks }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Достижения после выпуска -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Достижения после выпуска</h5>
+                    <a href="{% url 'graduate:achievement_create' graduate.pk %}" class="btn btn-sm btn-primary">
+                        <i class="bx bx-plus me-1"></i>Добавить достижение
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if achievements %}
+                        <div class="timeline">
+                            {% for achievement in achievements %}
+                                <div class="timeline-item">
+                                    <div class="timeline-point timeline-point-primary"></div>
+                                    <div class="timeline-event">
+                                        <div class="timeline-header mb-1">
+                                            <h6 class="mb-0">{{ achievement.title }}</h6>
+                                            <small class="text-muted">{{ achievement.date_achieved|date:"d.m.Y" }}</small>
+                                        </div>
+                                        {% if achievement.description %}
+                                            <p class="mb-2">{{ achievement.description }}</p>
+                                        {% endif %}
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-label-info">{{ achievement.get_category_display }}</span>
+                                            <a href="{% url 'graduate:achievement_delete' achievement.pk %}" 
+                                               class="btn btn-sm btn-outline-danger"
+                                               onclick="return confirm('Удалить это достижение?')">
+                                                <i class="bx bx-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bx bx-trophy bx-lg text-muted mb-2"></i>
+                            <p class="text-muted">Достижения после выпуска пока не добавлены</p>
+                            <a href="{% url 'graduate:achievement_create' graduate.pk %}" class="btn btn-primary">
+                                <i class="bx bx-plus me-1"></i>Добавить первое достижение
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.timeline-item:not(:last-child):before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 20px;
+    height: calc(100% - 20px);
+    width: 2px;
+    background-color: #d9dee3;
+}
+
+.timeline-point {
+    position: absolute;
+    left: -25px;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.timeline-point-primary {
+    background-color: #696cff;
+}
+
+.timeline-event {
+    background: #f5f5f9;
+    border-radius: 6px;
+    padding: 15px;
+}
+</style>
+{% endblock %}

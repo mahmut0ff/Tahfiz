@@ -1,10 +1,12 @@
 from django.urls import path
 from .views import *
 
+app_name = 'grade'
+
 urlpatterns = [
-    path('group-list/', group_list, name='grade-group-list'),
-    path('subject-list/<int:pk>/', subject_list, name='grade-subject-list'),
-    path('list/<int:group_pk>/<int:subject_pk>/', list, name='grade-list'),
-    path('diary/', diary, name='grade-diary'),
-    path('delete/<int:group_pk>/<int:subject_pk>/<int:pk>', delete, name='grade-delete'),
+    path('groups/', group_list, name='group_list'),
+    path('groups/<int:pk>/subjects/', subject_list, name='subject_list'),
+    path('groups/<int:group_pk>/subjects/<int:subject_pk>/', grade_list, name='list'),
+    path('diary/', diary, name='diary'),
+    path('groups/<int:group_pk>/subjects/<int:subject_pk>/<int:pk>/delete/', delete, name='delete'),
 ]

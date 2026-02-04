@@ -13,7 +13,7 @@
                         <ol class="list-group list-group-numbered">
                         {% for lesson in group.course.lesson_set.all %}
                             {% if lesson.access and group in lesson.group_access.all %}
-                            <li class="list-group-item"><a href="{% url 'lesson-detail' group.id lesson.id %}"><strong class="text-dark">{{ lesson.title }}</strong></a></li>
+                            <li class="list-group-item"><span class="text-dark">{{ lesson.title }}</span></li>
                             {% endif %}
                         {% endfor %}
                         </ol>

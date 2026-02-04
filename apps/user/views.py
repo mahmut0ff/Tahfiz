@@ -8,7 +8,7 @@ from apps.user.models import User
 
 def login_page(request):
     if request.user.is_authenticated:
-        return redirect('schedule')
+        return redirect('dashboard:dashboard')
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -19,7 +19,7 @@ def login_page(request):
             
             login(request, user)
             messages.success(request, 'Вы вошли в систему')
-            return redirect('schedule')
+            return redirect('dashboard:dashboard')
         else:
             messages.error(request, 'Неверное имя пользователя или пароль')
 
@@ -28,7 +28,7 @@ def login_page(request):
 
 def logout_user(request):
     logout(request)
-    return redirect('schedule')
+    return redirect('user:login')
 
 
 def update(request):
@@ -38,5 +38,5 @@ def update(request):
         user.username = username
         user.save()
         messages.success(request, 'Вы успешно изменили свой логин')
-        return redirect('user-update')
+        return redirect('user:update')
     return render(request, 'user/update.html')

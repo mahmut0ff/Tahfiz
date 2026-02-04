@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить достижение - {{ graduate.full_name }}{% endblock %}
+
+{% block content %}
+{% include 'includes/messages.html' %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Добавить достижение</h5>
+                    <a href="{% url 'graduate:detail' graduate.pk %}" class="btn btn-secondary">
+                        <i class="bx bx-arrow-back me-1"></i>Назад
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="text-muted">Выпускник:</h6>
+                        <p class="mb-0"><strong>{{ graduate.full_name }}</strong></p>
+                        <small class="text-muted">Выпуск {{ graduate.graduation_year }}</small>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }} *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small">{{ form.title.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">{{ form.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date_achieved.id_for_label }}" class="form-label">{{ form.date_achieved.label }} *</label>
+                                {{ form.date_achieved }}
+                                {% if form.date_achieved.errors %}
+                                    <div class="text-danger small">{{ form.date_achieved.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                    <div class="text-danger small">{{ form.category.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'graduate:detail' graduate.pk %}" class="btn btn-secondary">Отмена</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bx bx-save me-1"></i>Сохранить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

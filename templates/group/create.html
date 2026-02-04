@@ -1,28 +1,119 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Создать группу{% endblock %}
 
 {% block content %}
 {% include 'includes/messages.html' %}
-<div class="row">
-    <div class="col-lg-6 col-md-8 col-sm-10 mx-auto">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Создание группы</h5>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bx bx-group me-2 text-primary"></i>
+                                Создать группу
+                            </h4>
+                            <p class="text-muted mb-0">Добавление новой учебной группы</p>
+                        </div>
+                        <a href="{% url 'group:list' %}" class="btn btn-outline-secondary">
+                            <i class="bx bx-arrow-back me-1"></i>Назад к списку
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label" for="group-title">Название</label>
-                        {{ form.title }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="group-course">Курс</label>
-                        {{ form.course }}
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Создать</button>
-                </form>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="row">
+        <div class="col-xl-6 col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Group Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="card-title mb-3">
+                                    <i class="bx bx-info-circle me-2 text-info"></i>
+                                    Информация о группе
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12 mb-3">
+                                <label class="form-label" for="title">
+                                    <i class="bx bx-group me-1"></i>Название группы *
+                                </label>
+                                {{ form.title }}
+                                <div class="form-text">Например: "Группа А", "Начинающие", "Продвинутые"</div>
+                                <div class="invalid-feedback">Пожалуйста, введите название группы</div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label" for="course">
+                                    <i class="bx bx-book-bookmark me-1"></i>Курс обучения *
+                                </label>
+                                {{ form.course }}
+                                <div class="form-text">Выберите курс, к которому будет относиться группа</div>
+                                <div class="invalid-feedback">Пожалуйста, выберите курс</div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-3">
+                                    <a href="{% url 'group:list' %}" class="btn btn-outline-secondary">
+                                        <i class="bx bx-x me-1"></i>Отмена
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bx bx-check me-1"></i>Создать группу
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.needs-validation .form-control:invalid {
+    border-color: #dc3545;
+}
+
+.needs-validation .form-control:valid {
+    border-color: #28a745;
+}
+
+.card-title {
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
 {% endblock %}

@@ -1,17 +1,16 @@
 from django.urls import path
-from .views  import *
+from .views import *
+
+app_name = 'teacher'
 
 urlpatterns = [
-    path('list/', list, name='teacher-list'),
-    path('create/', create, name='teacher-create'),
-    path('details/<str:pk>/', details, name='teacher-details'),
-    
-    path('students/', students, name='teacher-students'),
-    path('report-list/', report_list, name='teacher-report-list'),
-    path('delete/<str:pk>/', delete, name='teacher-delete'),
-
-    path('generated-code/', generated_code, name='teacher-generated-code'),
-    path('code/', code, name='teacher-code'),
-
-    path('attendance/', attendance_list, name='attendance-list'),
+    path('', list, name='list'),
+    path('create/', create, name='create'),
+    path('<int:pk>/', details, name='details'),
+    path('<int:pk>/delete/', delete, name='delete'),
+    path('students/', students, name='students'),
+    path('reports/', report_list, name='reports'),
+    path('code/', code, name='code'),
+    path('code/generated/', generated_code, name='generated_code'),
+    path('attendance/', attendance_list, name='attendance'),
 ]

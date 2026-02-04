@@ -13,7 +13,7 @@ def is_admin(func):
         if request.user.is_superuser or request.user.role == 'admin' or request.user.role == 'administrator':
             return func(request, *args, **kwargs)
         else:
-            return redirect('schedule')
+            return redirect('schedule:list')
     return wrapper
 
 
@@ -22,5 +22,5 @@ def is_teacher(func):
         if request.user.role == 'teacher':
             return func(request, *args, **kwargs)
         else:
-            return redirect('schedule')
+            return redirect('schedule:list')
     return wrapper

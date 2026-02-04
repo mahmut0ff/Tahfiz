@@ -21,7 +21,7 @@ def create(request):
             form.instance.user = user
             form.save()
             messages.success(request, 'Учитель создан')
-            return redirect('teacher-list')
+            return redirect('teacher:list')
         else:
             messages.error(request, 'Учитель не создан')
 
@@ -31,19 +31,40 @@ def create(request):
     }
     return render(request, 'teacher/create.html', context)
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 @is_admin
 def list(request):
     teachers = Teacher.objects.all().order_by('-id')
+    
+    # Поиск
+    search_query = request.GET.get('search', '')
+    if search_query:
+        teachers = teachers.filter(
+            Q(name__icontains=search_query) |
+            Q(phone__icontains=search_query) |
+            Q(user__username__icontains=search_query)
+        )
+    
+    # Фильтр по предмету
+    subject_filter = request.GET.get('subject', '')
+    if subject_filter:
+        teachers = teachers.filter(subjects__id=subject_filter)
+    
+    # Получаем данные для фильтров
+    from apps.schedule.models import Subject
+    subjects = Subject.objects.all()
 
     context = {
         'teachers': teachers,
+        'subjects': subjects,
+        'search_query': search_query,
+        'subject_filter': subject_filter,
     }
     return render(request, 'teacher/list.html', context)
 
 
 # Профиль учителя
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 @is_admin
 def details(request, pk):
 
@@ -53,14 +74,14 @@ def details(request, pk):
         form = TeacherForm(request.POST, request.FILES, instance=teacher)
         if form.is_valid():
             form.save()
-            return redirect('teacher-details', pk=pk)
+            return redirect('teacher:details', pk=pk)
 
     context = {'teacher': teacher, 'form': form}
     return render(request, 'teacher/details.html', context)
 
 
 # Ученики учителя
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 @is_teacher
 def students(request):
 
@@ -73,7 +94,7 @@ def students(request):
 
 
 # Список отчетов учителя
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 def report_list(request):
     report_list = TeacherReport.objects.all().order_by('-id')
     form = TeacherReportForm()
@@ -89,7 +110,7 @@ def report_list(request):
                 form.instance.teacher = teacher
                 form.instance.group = group
                 form.save()
-                return redirect('teacher-report-list')
+                return redirect('teacher:reports')
     except Teacher.DoesNotExist:
         form = None
         groups = []
@@ -103,17 +124,17 @@ def delete(request, pk):
     user = User.objects.get(teacher=teacher)
     teacher.delete()
     user.delete()
-    return redirect('teacher-list')
+    return redirect('teacher:list')
 
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 @is_admin
 def generated_code(request):
     generate_code()
     code = Code.objects.latest('created_at')
     return render(request, 'teacher/generated_code.html', {'code': code.value})
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 @is_teacher
 def code(request):
     form = TeacherCodeForm()
@@ -129,10 +150,10 @@ def code(request):
                 teacher = Teacher.objects.get(user=request.user)
                 Attendance.objects.create(teacher=teacher)
                 messages.success(request, 'Код подтвержден')
-                return redirect('teacher-code')
+                return redirect('teacher:code')
             else:
                 messages.error(request, 'Код не подтвержден')
-                return redirect('teacher-code')
+                return redirect('teacher:code')
     
     context = {
         'form': form,
@@ -143,7 +164,7 @@ def code(request):
     return render(request, 'teacher/code.html', context)
 
 
-@login_required(login_url='login')
+@login_required(login_url='user:login')
 @is_admin
 def attendance_list(request):
     current_year = datetime.now().year

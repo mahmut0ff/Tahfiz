@@ -1,92 +1,433 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block title %}Расписание занятий{% endblock %}
+
 {% block content %}
+{% include 'includes/messages.html' %}
 
-<div class="d-flex justify-content-between mb-3">
-    <span class="fs-3 fw-bold">Расписание</span>
-    <button onclick="window.print()" class="no-print btn btn-primary">Распечатать</button>
-</div>
-<div id="printTable">
-    <table class="table table-bordered">
-        <tr>
-            <th>Группа</th>
-            {% for day in days %}
-            <th>{{ day.title }}</th>
-            {% endfor %}
-        </tr>
-
-        {% for group in groups %}
-        <tr>
-            <td>
-                <a href="{% url 'group-details' group.id %}">{{ group.title }}</a>
-            </td>
-            {% for day in days %}
-            <td style="text-align: initial;">
-                {% for schedule in schedules %}
-                    <div class="modal fade" id="modalCenter{{schedule.id}}" tabindex="-1" style="display: none;"
-                        aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="modalCenterTitle">Удаление предмета из шкалы</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Вы действительно желаете удалить этот предмет {{ schedule.time_slot }}.{{schedule.subject.name }}?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-label-secondary"
-                                        data-bs-dismiss="modal">Закрыть</button>
-                                    <a href='{% url "schedule-delete" schedule.id %}' class='btn btn-danger'>Удалить</a>
-                                </div>
-                            </div>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bx bx-calendar-event me-2 text-primary"></i>
+                                Расписание занятий
+                            </h4>
+                            <p class="text-muted mb-0">Управление учебным расписанием медресе</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            {% if request.user.role == 'admin' %}
+                            <a href="{% url 'schedule:subject_create' %}" class="btn btn-success">
+                                <i class="bx bx-book me-1"></i>Добавить предмет
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'schedule:calendar' %}" class="btn btn-outline-primary">
+                                <i class="bx bx-calendar me-1"></i>Календарь
+                            </a>
                         </div>
                     </div>
-                   <div class='mb-1'>
-                     {% if schedule.group == group and schedule.day == day %}
-                        {% if request.user.role == 'admin' or request.user.role == 'administrator' %}
-                            <div class="" data-bs-toggle="modal" data-bs-target="#modalCenter{{schedule.id}}">
-                            <span>{{ schedule.time_slot }}.{{ schedule.subject.name }}</span>
-                            </div>
-                        {% else %}
-                            <span class="">{{ schedule.time_slot }}.{{ schedule.subject.name }}</span>
-                        {% endif %}
-                    {% endif %}
-                   </div>
-                {% endfor %}
-            </td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered schedule-table mb-0">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th class="group-header">
+                                        <i class="bx bx-group me-2"></i>
+                                        Группы
+                                    </th>
+                                    {% for day in days %}
+                                    <th class="day-header text-center {% if day.title == current_day %}current-day{% endif %}">
+                                        <i class="bx bx-calendar-event me-2"></i>
+                                        {{ day.title }}
+                                        <br>
+                                        <small class="badge bg-primary">
+                                            {{ day.schedule_count|default:0 }} занятий
+                                        </small>
+                                    </th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for group in groups %}
+                                <tr>
+                                    <td class="group-cell">
+                                        <div class="group-info">
+                                            <h6 class="mb-1 text-primary">{{ group.title }}</h6>
+                                            <small class="text-muted">{{ group.course.title|default:"Без курса" }}</small>
+                                        </div>
+                                    </td>
+                                    {% for day in days %}
+                                    <td class="schedule-cell">
+                                        <div class="subjects-container">
+                                            {% for schedule in schedules %}
+                                                {% if schedule.day == day and schedule.group == group %}
+                                                <div class="subject-item">
+                                                    <div class="subject-content">
+                                                        <i class="bx bx-book-open me-2 text-info"></i>
+                                                        <span class="subject-name">{{ schedule.subject.name|truncatechars:15 }}</span>
+                                                        {% if request.user.role == 'admin' %}
+                                                        <button class="btn btn-sm btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteModal{{ schedule.id }}" title="Удалить">
+                                                            <i class="bx bx-x"></i>
+                                                        </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                            
+                                            {% if request.user.role == 'admin' %}
+                                            <div class="add-subject-container">
+                                                <button class="btn btn-sm btn-outline-success w-100" data-bs-toggle="modal" data-bs-target="#addModal{{ group.id }}-{{ day.id }}">
+                                                    <i class="bx bx-plus me-1"></i>Добавить
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<!-- Add Subject Modals -->
+{% for day in days %}
+    {% for group in groups %}
+        {% if request.user.role == 'admin' %}
+        <div class="modal fade" id="addModal{{ group.id }}-{{ day.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">
+                            <i class="bx bx-plus-circle me-2"></i>
+                            Добавить занятие
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">День недели</label>
+                                    <input type="text" class="form-control" value="{{ day.title }}" readonly>
+                                    <input type="hidden" value="{{ day.id }}" name="day">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Группа</label>
+                                    <input type="text" class="form-control" value="{{ group.title }}" readonly>
+                                    <input type="hidden" value="{{ group.id }}" name="group">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Предмет *</label>
+                                <select class="form-select" name="subject" required>
+                                    <option value="">Выберите предмет</option>
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="submit" name="lesson" class="btn btn-success">
+                                <i class="bx bx-check me-1"></i>Добавить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+<!-- Delete Subject Modals -->
+{% for schedule in schedules %}
+<div class="modal fade" id="deleteModal{{ schedule.id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bx bx-trash me-2"></i>
+                    Удаление занятия
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="mb-3">
+                    <i class="bx bx-error-circle text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <h6>Удалить занятие из расписания?</h6>
+                <div class="alert alert-info mt-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bx bx-book-open me-2 text-primary"></i>
+                        <div class="text-start">
+                            <strong>{{ schedule.subject.name }}</strong><br>
+                            <small class="text-muted">{{ schedule.group.title }} - {{ schedule.day.title }}</small>
+                        </div>
+                    </div>
+                </div>
+                <small class="text-warning">
+                    <i class="bx bx-error-circle me-1"></i>
+                    Это действие нельзя отменить!
+                </small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <a href="{% url 'schedule:delete' schedule.id %}" class="btn btn-danger">
+                    <i class="bx bx-trash me-1"></i>Удалить
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
 <style>
-    table {
-        border-collapse: collapse;
-        width: 100%;
+/* Schedule Table */
+.schedule-table {
+    font-size: 0.9rem;
+}
+
+.schedule-table th,
+.schedule-table td {
+    vertical-align: top;
+    border: 1px solid #dee2e6;
+    padding: 12px 8px;
+}
+
+.group-header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+}
+
+.day-header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    min-width: 150px;
+    max-width: 180px;
+    width: 150px;
+}
+
+.group-cell {
+    background-color: #f8f9fa;
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+}
+
+.group-info h6 {
+    color: #495057;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.group-info small {
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+.schedule-cell {
+    min-width: 150px;
+    max-width: 180px;
+    width: 150px;
+    padding: 8px;
+}
+
+.subjects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 60px;
+}
+
+.subject-item {
+    background-color: #e3f2fd;
+    border: 1px solid #bbdefb;
+    border-radius: 6px;
+    padding: 6px 8px;
+    transition: all 0.2s ease;
+}
+
+.subject-item:hover {
+    background-color: #bbdefb;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.subject-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #1976d2;
+}
+
+.subject-name {
+    flex: 1;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80px;
+}
+
+.add-subject-container {
+    margin-top: auto;
+}
+
+.add-subject-container .btn {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-style: dashed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.8rem;
     }
-
-    @media print {
-        body * {
-            visibility: hidden;
-        }
-
-        #printTable,
-        #printTable * {
-            visibility: visible;
-        }
-
-        #printTable {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-        }
-        
-        .no-print {
-            display: none;
-        }
+    
+    .group-header,
+    .group-cell {
+        width: 120px;
+        min-width: 120px;
+        max-width: 120px;
     }
+    
+    .day-header,
+    .schedule-cell {
+        width: 100px;
+        min-width: 100px;
+        max-width: 100px;
+    }
+    
+    .subject-name {
+        max-width: 60px;
+    }
+    
+    .subject-content {
+        font-size: 0.7rem;
+    }
+}
+
+/* Table styling */
+.table-primary th {
+    background-color: #0d6efd !important;
+    color: white !important;
+    border-color: #0d6efd !important;
+    font-weight: 600;
+}
+
+.table-primary th.current-day {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    position: relative;
+}
+
+.table-primary th.current-day::after {
+    content: "Сегодня";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ffc107;
+    color: #000;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.table-primary th .badge {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+.table-primary th i {
+    color: white !important;
+}
+
+.table-primary th small {
+    color: white !important;
+}
+
+.table-bordered {
+    border: 2px solid #dee2e6;
+}
+
+/* Card styling */
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Button improvements */
+.btn-outline-danger:hover {
+    color: white;
+}
+
+.btn-outline-success:hover {
+    color: white;
+}
+
+/* Badge styling */
+.badge {
+    font-size: 0.7rem;
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to table rows
+    const tableRows = document.querySelectorAll('.schedule-table tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f8f9fa';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+
+    // Add animation to modals
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('show.bs.modal', function() {
+            this.querySelector('.modal-dialog').style.transform = 'scale(0.9)';
+            this.querySelector('.modal-dialog').style.opacity = '0';
+            
+            setTimeout(() => {
+                this.querySelector('.modal-dialog').style.transition = 'all 0.2s ease';
+                this.querySelector('.modal-dialog').style.transform = 'scale(1)';
+                this.querySelector('.modal-dialog').style.opacity = '1';
+            }, 10);
+        });
+    });
+});
+</script>
 {% endblock %}

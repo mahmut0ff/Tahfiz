@@ -2,7 +2,6 @@ from rest_framework import serializers
 from apps.student.models import Student
 from apps.group.models import Group
 from apps.grade.models import Grade
-from apps.transaction.models import Transaction
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -23,8 +22,3 @@ class GradeSerializer(serializers.ModelSerializer):
         model = Grade
         fields = ['id', 'student', 'mark', 'pages', 'subject', 'teacher', 'date']
 
-
-class TransactionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Transaction
-        fields = '__all__'

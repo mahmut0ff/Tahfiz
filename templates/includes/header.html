@@ -1,121 +1,297 @@
 {% load static %}
-<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-  id="layout-navbar">
-  <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0   d-xl-none ">
-    <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-      <i class="bx bx-menu bx-sm"></i>
-    </a>
-  </div>
+<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
   <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+    
+    <!-- Mobile Menu Toggle -->
+    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+      <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+        <i class="bx bx-menu bx-sm"></i>
+      </a>
+    </div>
+    
+    <!-- Brand Section -->
+    <div class="navbar-brand app-brand demo d-flex align-items-center">
+      <span class="app-brand-logo demo">
+        <div class="brand-icon">
+          <i class="bx bx-book-reader text-primary" style="font-size: 2rem;"></i>
+        </div>
+      </span>
+      <span class="app-brand-text demo menu-text fw-bolder ms-2">
+        <div>
+          <h5 class="mb-0 text-dark fw-bold">TAHFIZ</h5>
+          <small class="text-muted fst-italic" style="font-size: 0.75rem;">Медресе</small>
+        </div>
+      </span>
+    </div>
 
+    <!-- Date Display -->
+    <div class="d-none d-lg-flex align-items-center ms-4">
+      <div class="date-display bg-light px-3 py-2 rounded">
+        <i class="bx bx-calendar text-primary me-2"></i>
+        <span class="text-muted fw-medium">{% now "l, j F Y" %}</span>
+      </div>
+    </div>
 
+    <!-- Spacer -->
+    <div class="flex-grow-1"></div>
 
+    <!-- Right Side Navigation -->
     <ul class="navbar-nav flex-row align-items-center ms-auto">
-          
-
-          
-          <!-- Place this tag where you want the button to render. -->
-      <li class="nav-item dropdown-style-switcher dropdown me-2 me-xl-0">
-        <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-          <i class='bx bx-sm'></i>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end dropdown-styles">
-          <li>
-            <a class="dropdown-item" href="javascript:void(0);" data-theme="light">
-              <span class="align-middle"><i class='bx bx-sun me-2'></i>Светлаю</span>
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="javascript:void(0);" data-theme="dark">
-              <span class="align-middle"><i class="bx bx-moon me-2"></i>Темная</span>
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="javascript:void(0);" data-theme="system">
-              <span class="align-middle"><i class="bx bx-desktop me-2"></i>Системная</span>
-            </a>
-          </li>
-          
-        </ul>
+      
+      <!-- Quick Add (Admin only) -->
+      {% if request.user.role == 'admin' or request.user.is_superuser %}
+      <li class="nav-item navbar-dropdown dropdown-user dropdown me-3">
+        <div class="dropdown">
+          <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="bx bx-plus me-1"></i>
+            <span class="d-none d-sm-inline">Добавить</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{% url 'student:create' %}">
+              <i class="bx bx-user-plus me-2 text-success"></i>Студента
+            </a></li>
+            <li><a class="dropdown-item" href="{% url 'teacher:create' %}">
+              <i class="bx bx-chalkboard me-2 text-info"></i>Преподавателя
+            </a></li>
+            <li><a class="dropdown-item" href="{% url 'group:create' %}">
+              <i class="bx bx-group me-2 text-warning"></i>Группу
+            </a></li>
+          </ul>
+        </div>
       </li>
-        <!-- User -->
-        <li class="nav-item navbar-dropdown dropdown-user dropdown">
-          <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false">
+      {% endif %}
+
+      <!-- Notifications -->
+      <li class="nav-item navbar-dropdown dropdown-user dropdown me-3">
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary btn-sm position-relative" type="button" data-bs-toggle="dropdown">
+            <i class="bx bx-bell"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+              2
+              <span class="visually-hidden">непрочитанные сообщения</span>
+            </span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><h6 class="dropdown-header d-flex justify-content-between align-items-center">
+              <span>Уведомления</span>
+              <span class="badge bg-primary rounded-pill">2</span>
+            </h6></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="text-center py-4">
+              <i class="bx bx-bell-off text-muted mb-2" style="font-size: 2rem;"></i>
+              <p class="text-muted mb-0 small">Нет новых уведомлений</p>
+            </li>
+          </ul>
+        </div>
+      </li>
+
+      <!-- User Profile -->
+      <li class="nav-item navbar-dropdown dropdown-user dropdown">
+        <div class="dropdown">
+          <button class="btn btn-link dropdown-toggle hide-arrow d-flex align-items-center p-0" type="button" data-bs-toggle="dropdown">
             <div class="avatar avatar-online">
-              {% if request.user.student.image %}
-              <img src="{{ request.user.student.image.url }}" class="rounded-circle" width="30" height="30" style="object-fit: cover;" alt="">
-            {% elif request.user.teacher.image %}
-              <img src="{{ request.user.teacher.image.url }}" class="rounded-circle" width="30" height="30" style="object-fit: cover;" alt="">
-            {% elif request.user.administrator.image %}
-              <img src="{{ request.user.administrator.image.url }}" class="rounded-circle" width="30" height="30" style="object-fit: cover;" alt="">
-            {% else %}
-              <img src="{% static 'assets/img/logo/logo.png' %}" class="rounded-circle" width="30" height="30" style="object-fit: cover;" alt="">
-            {% endif %}
+              {% if request.user.student and request.user.student.image %}
+                <img src="{{ request.user.student.image.url }}" alt="Avatar" class="w-px-40 h-auto rounded-circle">
+              {% elif request.user.teacher and request.user.teacher.image %}
+                <img src="{{ request.user.teacher.image.url }}" alt="Avatar" class="w-px-40 h-auto rounded-circle">
+              {% elif request.user.administrator and request.user.administrator.image %}
+                <img src="{{ request.user.administrator.image.url }}" alt="Avatar" class="w-px-40 h-auto rounded-circle">
+              {% else %}
+                <div class="avatar-initial rounded-circle bg-label-secondary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                  <i class="bx bx-user"></i>
+                </div>
+              {% endif %}
             </div>
-          </a>
+            <div class="d-none d-sm-flex flex-column align-items-start ms-2">
+              {% if request.user.role == 'administrator' and request.user.administrator %}
+                <span class="fw-semibold">{{ request.user.administrator.name|truncatewords:2 }}</span>
+                <small class="text-muted">Администратор</small>
+              {% elif request.user.role == 'admin' %}
+                <span class="fw-semibold">Админ</span>
+                <small class="text-muted">Администратор</small>
+              {% elif request.user.role == 'teacher' and request.user.teacher %}
+                <span class="fw-semibold">{{ request.user.teacher.name|truncatewords:2 }}</span>
+                <small class="text-muted">Преподаватель</small>
+              {% elif request.user.role == 'student' and request.user.student %}
+                <span class="fw-semibold">{{ request.user.student.name|truncatewords:2 }}</span>
+                <small class="text-muted">Студент</small>
+              {% else %}
+                <span class="fw-semibold">{{ request.user.username }}</span>
+                <small class="text-muted">{{ request.user.get_role_display }}</small>
+              {% endif %}
+            </div>
+          </button>
+          
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
-              <a class="dropdown-item" href="">
+              <div class="dropdown-item">
                 <div class="d-flex">
                   <div class="flex-shrink-0 me-3">
                     <div class="avatar avatar-online">
-                      {% if request.user.student.image %}
-                        <img src="{{ request.user.student.image.url }}" class="rounded-circle" width="30" height="30" style="object-fit: cover;" alt="">
-                      {% elif request.user.teacher.image %}
-                        <img src="{{ request.user.teacher.image.url }}" class="rounded-circle" width="30" height="30" style="object-fit: cover;" alt="">
-                      {% elif request.user.administrator.image %}
-                        <img src="{{ request.user.administrator.image.url }}" class="rounded-circle" width="30" height="30" style="object-fit: cover;" alt="">
+                      {% if request.user.student and request.user.student.image %}
+                        <img src="{{ request.user.student.image.url }}" alt="Avatar" class="w-px-40 h-auto rounded-circle">
+                      {% elif request.user.teacher and request.user.teacher.image %}
+                        <img src="{{ request.user.teacher.image.url }}" alt="Avatar" class="w-px-40 h-auto rounded-circle">
+                      {% elif request.user.administrator and request.user.administrator.image %}
+                        <img src="{{ request.user.administrator.image.url }}" alt="Avatar" class="w-px-40 h-auto rounded-circle">
                       {% else %}
-                        <img src="{% static 'assets/img/logo/logo.png' %}" class="rounded-circle" width="30" height="30" style="object-fit: cover;" alt="">
-                      {% endif %}  
+                        <div class="avatar-initial rounded-circle bg-label-secondary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                          <i class="bx bx-user"></i>
+                        </div>
+                      {% endif %}
                     </div>
                   </div>
                   <div class="flex-grow-1">
-                    {% if request.user.role == 'administrator' %}
-                    <h6 class="mb-0">{{ request.user.administrator.name }}</h6>
-                    <small class="text-muted">{{ request.user.get_role_display }}</small>
-
+                    {% if request.user.role == 'administrator' and request.user.administrator %}
+                      <span class="fw-semibold d-block">{{ request.user.administrator.name }}</span>
+                      <small class="text-muted">Администратор</small>
                     {% elif request.user.role == 'admin' %}
-                      <h6 class="mb-0">{{ request.user.admin.name|truncatewords:1 }}</h6>
-                                  <small class="text-muted">{{ request.user.get_role_display }}</small>
-                    {% elif request.user.role == 'teacher' %}
-                      <h6 class="mb-0">{{ request.user.teacher.name|truncatewords:1 }}</h6>
-                                  <small class="text-muted">{{ request.user.get_role_display }}</small>
-                    {% elif request.user.role == 'student' %}
-                      <h6 class="mb-0">{{ request.user.student.name|truncatewords:1 }}</h6>
-                                  <small class="text-muted">{{ request.user.get_role_display }}</small>
+                      <span class="fw-semibold d-block">Администратор</span>
+                      <small class="text-muted">Админ</small>
+                    {% elif request.user.role == 'teacher' and request.user.teacher %}
+                      <span class="fw-semibold d-block">{{ request.user.teacher.name }}</span>
+                      <small class="text-muted">Преподаватель</small>
+                    {% elif request.user.role == 'student' and request.user.student %}
+                      <span class="fw-semibold d-block">{{ request.user.student.name }}</span>
+                      <small class="text-muted">Студент</small>
+                    {% else %}
+                      <span class="fw-semibold d-block">{{ request.user.username }}</span>
+                      <small class="text-muted">{{ request.user.get_role_display }}</small>
                     {% endif %}
                   </div>
                 </div>
-              </a>
+              </div>
             </li>
-            <li>
-              <div class="dropdown-divider my-1"></div>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'user-update' %}">
-                <i class="bx bx-user me-3"></i><span>Изменить имя пользователя</span>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'password_change' %}">
-                <i class="bx bx-edit-alt me-3"></i><span>Изменить пароль</span>
-              </a>
-            </li>
-
-            <li>
-              <div class="dropdown-divider my-1"></div>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'logout' %}">
-                <i class="bx bx-power-off me-3"></i><span>Выход</span>
-              </a>
-            </li>
+            <li><div class="dropdown-divider"></div></li>
+            <li><a class="dropdown-item" href="{% url 'user:update' %}">
+              <i class="bx bx-user me-2"></i>
+              <span class="align-middle">Профиль</span>
+            </a></li>
+            <li><a class="dropdown-item" href="{% url 'user:password_change' %}">
+              <i class="bx bx-lock-alt me-2"></i>
+              <span class="align-middle">Изменить пароль</span>
+            </a></li>
+            <li><div class="dropdown-divider"></div></li>
+            <li><a class="dropdown-item" href="{% url 'user:logout' %}">
+              <i class="bx bx-power-off me-2"></i>
+              <span class="align-middle">Выйти</span>
+            </a></li>
           </ul>
-        </li>
-        <!--/ User -->
-          
-
-        </ul>
+        </div>
+      </li>
+    </ul>
   </div>
 </nav>
+
+<style>
+/* Header Styling */
+.layout-navbar {
+  background: #fff !important;
+  box-shadow: 0 2px 6px 0 rgba(67, 89, 113, 0.12);
+  border-bottom: 1px solid #d9dee3;
+}
+
+.app-brand {
+  margin-right: 0;
+}
+
+.brand-icon {
+  width: 50px;
+  height: 50px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.date-display {
+  border: 1px solid #e3e6f0;
+  font-size: 0.875rem;
+}
+
+/* Avatar Styling */
+.avatar {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-online::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: #71dd37;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.w-px-40 {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.avatar-initial {
+  background-color: #f5f5f9 !important;
+  color: #8592a3;
+}
+
+/* Dropdown Improvements */
+.dropdown-menu {
+  border: 0;
+  box-shadow: 0 0.25rem 1rem rgba(161, 172, 184, 0.45);
+  border-radius: 0.375rem;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(67, 89, 113, 0.04);
+  transform: translateX(2px);
+}
+
+.dropdown-item i {
+  width: 20px;
+  text-align: center;
+}
+
+/* Button Styling */
+.btn-link {
+  text-decoration: none;
+  border: none;
+  background: none;
+  color: #697a8d;
+}
+
+.btn-link:hover {
+  color: #5a6c7d;
+}
+
+.hide-arrow.dropdown-toggle::after {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 1199.98px) {
+  .date-display {
+    display: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .app-brand-text {
+    display: none;
+  }
+  
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+</style>

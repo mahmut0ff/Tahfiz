@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Рейтинг студентов{% endblock %}
+
+{% block content %}
+{% include 'includes/messages.html' %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bx bx-trophy me-2 text-warning"></i>
+                                Рейтинг студентов
+                            </h4>
+                            <p class="text-muted mb-0">Выберите категорию для просмотра рейтинга</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-label-info me-2">
+                                <i class="bx bx-book me-1"></i>
+                                {{ courses|length }} курсов
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Categories -->
+    <div class="row">
+        <!-- Общий рейтинг -->
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+            <div class="card h-100 rating-card">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-3">
+                        <span class="avatar-initial rounded bg-label-warning">
+                            <i class="bx bx-trophy bx-lg"></i>
+                        </span>
+                    </div>
+                    <h5 class="card-title mb-2">Общий рейтинг</h5>
+                    <p class="text-muted mb-3">Рейтинг всех студентов медресе</p>
+                    <div class="mb-3">
+                        <span class="badge bg-label-primary">Все курсы</span>
+                    </div>
+                    <a href="{% url 'student:total_rating_list' %}" class="btn btn-warning w-100">
+                        <i class="bx bx-show me-1"></i>Посмотреть рейтинг
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Рейтинг по курсам -->
+        {% for course in courses %}
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+            <div class="card h-100 rating-card">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-3">
+                        <span class="avatar-initial rounded bg-label-success">
+                            <i class="bx bx-book-bookmark bx-lg"></i>
+                        </span>
+                    </div>
+                    <h5 class="card-title mb-2">{{ course.title }}</h5>
+                    <p class="text-muted mb-3">Рейтинг студентов курса</p>
+                    <div class="mb-3">
+                        <span class="badge bg-label-info">
+                            <i class="bx bx-user me-1"></i>
+                            {{ course.student_set.count }} студентов
+                        </span>
+                    </div>
+                    <a href="{% url 'student:rating_by_course' course.id %}" class="btn btn-success w-100">
+                        <i class="bx bx-show me-1"></i>Посмотреть рейтинг
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-3">
+                        <i class="bx bx-book bx-lg text-muted"></i>
+                    </div>
+                    <h5 class="text-muted">Курсы не найдены</h5>
+                    <p class="text-muted mb-4">В системе пока нет созданных курсов для отображения рейтинга.</p>
+                    {% if request.user.role == 'admin' %}
+                        <a href="{% url 'dashboard:dashboard' %}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i>Перейти к управлению
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Info Card -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="mb-2">
+                                <i class="bx bx-info-circle me-2 text-info"></i>
+                                Как рассчитывается рейтинг?
+                            </h6>
+                            <p class="text-muted mb-0">
+                                Рейтинг рассчитывается по формуле: <strong>Оценка × Количество страниц</strong>. 
+                                Это позволяет учитывать как качество знаний (оценка), так и объем изученного материала (страницы).
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <div class="d-flex justify-content-md-end gap-2">
+                                <span class="badge bg-label-success">Оценка</span>
+                                <span class="text-muted">×</span>
+                                <span class="badge bg-label-info">Страницы</span>
+                                <span class="text-muted">=</span>
+                                <span class="badge bg-label-warning">Баллы</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.rating-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e7eaf3;
+}
+
+.rating-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 25px 0 rgba(105, 108, 255, 0.1);
+}
+
+.avatar-initial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+{% endblock %}

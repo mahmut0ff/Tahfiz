@@ -93,31 +93,37 @@
     <script src="{% static 'assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
 
         <script>
-        const scrollSpeed = 1;
-        let scrollDirection = 'down';
+    const scrollSpeed = 1;
+    let scrollDirection = 'down';
+    let scrollActive = true;
+    let scrollInterval;
 
-        function autoScroll() {
-            const scrollInterval = setInterval(() => {
-                if (scrollDirection === 'down') {
-                    // Прокручиваем страницу вниз
-                    window.scrollBy(0, scrollSpeed);
-                    // Проверяем, достигли ли конца страницы
-                    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-                        scrollDirection = 'up'; // Меняем направление на "вверх"
-                    }
-                } else if (scrollDirection === 'up') {
-                    // Прокручиваем страницу вверх
-                    window.scrollBy(0, -scrollSpeed);
-                    // Проверяем, достигли ли верха страницы
-                    if (window.scrollY <= 0) {
-                        scrollDirection = 'down'; // Меняем направление на "вниз"
-                    }
+    function autoScroll() {
+        scrollInterval = setInterval(() => {
+            if (!scrollActive) return;
+
+            if (scrollDirection === 'down') {
+                window.scrollBy(0, scrollSpeed);
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                    scrollDirection = 'up';
                 }
-            }, 10); // Интервал скроллинга, в миллисекундах
-        }
+            } else {
+                window.scrollBy(0, -scrollSpeed);
+                if (window.scrollY <= 0) {
+                    scrollDirection = 'down';
+                }
+            }
+        }, 10);
+    }
 
-        // Запускаем прокрутку при загрузке страницы
-        window.onload = autoScroll;
-    </script>
+    function stopScroll() {
+        scrollActive = false;
+        clearInterval(scrollInterval);
+    }
+
+    window.onload = autoScroll;
+    window.addEventListener("wheel", stopScroll);
+</script>
+
 </body>
 </html>

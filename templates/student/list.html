@@ -1,93 +1,297 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block title %}Студенты{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between mb-3">
-  <span class="fs-2 fw-bold">
-    Студенты <sup class="text-muted fs-6">({{ students.count }})</sup>
-  </span>
-  <a href="{% url 'student-create' %}" class="btn btn-primary no-print">Создать</a>
-</div>
-<div class="card">
-  <div class="card-body">
-    <div class="table-responsive text-nowrap">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Имя</th>
-            <th>Телефон</th>
-            <th>Курс</th>
-            <th>Группа</th>
-            <th>Оплата</th>
-            <th>Допуск</th>
-            <th style="width: 30px;">Статус</th>
-            <th style="width: 30px;">Действия</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for student in students %}
-          <div class="modal fade" id="modalCenter-{{ student.id }}" tabindex="-1" style="display: none;"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="modalCenterTitle">Удаление группы</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+{% include 'includes/messages.html' %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bx bx-user me-2 text-info"></i>
+                                Студенты медресе
+                            </h4>
+                            <p class="text-muted mb-0">Управление учащимися</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-label-info me-2">
+                                <i class="bx bx-user me-1"></i>
+                                {{ students.count }} студентов
+                            </span>
+                            <a href="{% url 'student:create' %}" class="btn btn-info">
+                                <i class="bx bx-plus me-1"></i>Добавить студента
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                  Удалить группу {{ student.title }}?
-                </div>
-                <div class="modal-footer">
-                  <a href="{% url 'student-delete' student.id %}" class="btn btn-danger">Удалить</a>
-                </div>
-              </div>
             </div>
-          </div>
-          <tr>
-            <td>
-              <a href="{% url 'student-details' student.id %}">{{ student.name }}</a>
-            </td>
-            <td>
-              <span>{{ student.phone }}</span>
-            </td>
-            <td><span class="">{{ student.group.first.course.title }}</span></td>
-            <td><span class="">{% for i in student.group.all %}
-              {{ i }}
-              {% endfor %}
-              </span></td>
-            <td><span class="">{{ student.payed }}/{{ student.to_pay }}</span></td>
-            <td>
-              {% if student.semester_access %}
-              <span class="badge bg-success">Есть</span></td>
-              {% else %}
-              <span class="badge bg-danger">Нет</span></td>
-              {% endif %}
-            <td>
-              {% if student.status %}
-                <span class="badge bg-success">Обучается</span>
-              {% else %}
-                <span class="badge bg-danger">Не обучается</span>
-              {% endif %}
-            </td>
-            <td>
-              <div class="dropdown">
-                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i
-                    class="bx bx-dots-vertical-rounded"></i></button>
-                <div class="dropdown-menu">
-                  <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                    data-bs-target="#modalCenter-{{ student.id }}">
-                    <i class="bx bx-trash me-1"></i>
-                    Удалить
-                  </button>
-                </div>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
+        </div>
     </div>
-  </div>
+
+    <!-- Фильтры и поиск -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Поиск</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bx bx-search"></i></span>
+                                    <input type="text" name="search" class="form-control" 
+                                           placeholder="Имя, телефон..." 
+                                           value="{{ search_query }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Курс</label>
+                                <select name="course" class="form-select">
+                                    <option value="">Все</option>
+                                    {% for course in courses %}
+                                        <option value="{{ course.id }}" {% if course_filter == course.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ course.title|truncatechars:15 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Статус</label>
+                                <select name="student_status" class="form-select">
+                                    <option value="">Все</option>
+                                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Активный</option>
+                                    <option value="graduated" {% if status_filter == 'graduated' %}selected{% endif %}>Выпускник</option>
+                                    <option value="expelled" {% if status_filter == 'expelled' %}selected{% endif %}>Исключен</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Обучение</label>
+                                <select name="learning_status" class="form-select">
+                                    <option value="">Все</option>
+                                    <option value="active" {% if learning_status == 'active' %}selected{% endif %}>Да</option>
+                                    <option value="inactive" {% if learning_status == 'inactive' %}selected{% endif %}>Нет</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-flex gap-1">
+                                    <button type="submit" class="btn btn-primary flex-fill">
+                                        <i class="bx bx-search"></i>
+                                    </button>
+                                    <a href="{% url 'student:list' %}" class="btn btn-outline-secondary">
+                                        <i class="bx bx-refresh"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Students Grid -->
+    <div class="row" id="studentsGrid">
+        {% for student in students %}
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+            <div class="card h-100 student-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar me-3">
+                                {% if student.image %}
+                                    <img src="{{ student.image.url }}" 
+                                         alt="{{ student.name }}" 
+                                         class="rounded-circle" 
+                                         width="40" height="40">
+                                {% else %}
+                                    <img src="{% static 'assets/img/user_default.jpg' %}" 
+                                         alt="{{ student.name }}" 
+                                         class="rounded-circle" 
+                                         width="40" height="40">
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ student.name }}</h6>
+                                <small class="text-muted">{{ student.phone|default:"Телефон не указан" }}</small>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn p-0" type="button" data-bs-toggle="dropdown">
+                                <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'student:details' student.id %}">
+                                    <i class="bx bx-show me-2"></i>Просмотр
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item text-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalCenter-{{ student.id }}">
+                                    <i class="bx bx-trash me-2"></i>Удалить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {% if student.course %}
+                            <p class="text-muted mb-2">
+                                <i class="bx bx-book-bookmark me-1"></i>
+                                {{ student.course.title }}
+                            </p>
+                        {% endif %}
+                        
+                        {% if student.group.all %}
+                            <div class="mb-2">
+                                <small class="text-muted">Группы:</small>
+                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                    {% for group in student.group.all %}
+                                        <span class="badge bg-label-primary">{{ group.title }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if student.to_pay %}
+                            <p class="text-muted mb-2">
+                                <i class="bx bx-money me-1"></i>
+                                К оплате: {{ student.to_pay }} сом
+                            </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <small class="text-muted">Статус обучения:</small>
+                            <div class="mt-1">
+                                {% if student.status %}
+                                    <span class="badge bg-success">Обучается</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Не обучается</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <small class="text-muted">Статус студента:</small>
+                            <div class="mt-1">
+                                {% if student.student_status == 'active' %}
+                                    <span class="badge bg-label-success">Активный</span>
+                                {% elif student.student_status == 'graduated' %}
+                                    <span class="badge bg-label-warning">Выпускник</span>
+                                {% elif student.student_status == 'expelled' %}
+                                    <span class="badge bg-label-danger">Исключен</span>
+                                {% else %}
+                                    <span class="badge bg-label-secondary">Неактивный</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <a href="{% url 'student:details' student.id %}" class="btn btn-info">
+                            <i class="bx bx-show me-1"></i>
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal для удаления -->
+        <div class="modal fade" id="modalCenter-{{ student.id }}" tabindex="-1" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Удаление студента</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <i class="bx bx-error-circle bx-lg text-danger mb-3"></i>
+                            <h6>Вы уверены, что хотите удалить студента?</h6>
+                            <p class="text-muted">{{ student.name }}</p>
+                            <small class="text-warning">Это действие нельзя отменить!</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <a href="{% url 'student:delete' student.id %}" class="btn btn-danger">Удалить</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-3">
+                        <i class="bx bx-user bx-lg text-muted"></i>
+                    </div>
+                    <h5 class="text-muted">Студенты не найдены</h5>
+                    <p class="text-muted mb-4">
+                        {% if search_query or course_filter or status_filter or learning_status %}
+                            По заданным критериям поиска студенты не найдены.
+                        {% else %}
+                            В системе пока нет зарегистрированных студентов.
+                        {% endif %}
+                    </p>
+                    {% if search_query or course_filter or status_filter or learning_status %}
+                        <a href="{% url 'student:list' %}" class="btn btn-outline-primary me-2">
+                            <i class="bx bx-refresh me-1"></i>Сбросить фильтры
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'student:create' %}" class="btn btn-info">
+                        <i class="bx bx-plus me-1"></i>Добавить студента
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 
+<style>
+.student-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e7eaf3;
+}
+
+.student-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 25px 0 rgba(3, 195, 236, 0.1);
+}
+
+.avatar img {
+    object-fit: cover;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cardViewBtn = document.getElementById('cardView');
+    const tableViewBtn = document.getElementById('tableView');
+    const studentsGrid = document.getElementById('studentsGrid');
+
+    if (cardViewBtn && tableViewBtn) {
+        cardViewBtn.addEventListener('click', function() {
+            cardViewBtn.classList.add('active');
+            tableViewBtn.classList.remove('active');
+            studentsGrid.classList.remove('d-none');
+        });
+
+        tableViewBtn.addEventListener('click', function() {
+            tableViewBtn.classList.add('active');
+            cardViewBtn.classList.remove('active');
+            studentsGrid.classList.add('d-none');
+        });
+    }
+});
+</script>
 {% endblock %}

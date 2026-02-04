@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Календарь расписания{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bx bx-calendar-event me-2 text-primary"></i>
+                                Календарь расписания
+                            </h4>
+                            <p class="text-muted mb-0">Интерактивный календарь занятий</p>
+                        </div>
+                        <a href="{% url 'schedule:list' %}" class="btn btn-primary">
+                            <i class="bx bx-table me-1"></i>Таблица
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div id="calendar-container">
+                        <!-- Calendar will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+</style>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar-container');
+    
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridWeek',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,dayGridWeek'
+        },
+        events: [
+            {% for schedule in schedules %}
+            {
+                title: '{{ schedule.subject.name }} - {{ schedule.group.title }}',
+                daysOfWeek: [{{ schedule.day.id|add:"-1" }}],
+                startTime: '09:00',
+                endTime: '10:30',
+                color: '#667eea'
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        height: 'auto',
+        locale: 'ru'
+    });
+    
+    calendar.render();
+});
+</script>
+{% endblock %}

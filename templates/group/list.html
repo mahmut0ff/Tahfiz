@@ -1,102 +1,189 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block title %}Группы{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between mb-3">
-  <span class="fs-2 fw-bold">
-    Группы <sup class="text-muted fs-6">({{ groups.count }})</sup>
-  </span>
-  {% if request.user.role != 'student' %}
-  <a href="{% url 'group-create' %}" class="btn btn-primary no-print">Создать</a>
-  {% endif %}
-</div>
-<div class="card">
-  <div class="card-body">
-    <div class="table-responsive text-nowrap">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Название</th>
-            <th style="width: 30px;">Курс</th>
-            <th>Преподаватели</th>
-            <th>Студенты</th>
-            <th style="width: 30px;">Действия</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for group in groups %}
-          <div class="modal fade" id="modalCenter-{{ group.id }}" tabindex="-1" style="display: none;"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="modalCenterTitle">Удаление группы</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+{% include 'includes/messages.html' %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="bx bx-group me-2 text-primary"></i>
+                                Группы медресе
+                            </h4>
+                            <p class="text-muted mb-0">Управление учебными группами</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-label-primary me-2">
+                                <i class="bx bx-group me-1"></i>
+                                {{ groups|length }} групп
+                            </span>
+                            {% if request.user.role != 'student' %}
+                            <a href="{% url 'group:create' %}" class="btn btn-primary">
+                                <i class="bx bx-plus me-1"></i>Создать группу
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                  Удалить группу {{ group.title }}?
-                </div>
-                <div class="modal-footer">
-                  <a href="{% url 'group-delete' group.id %}" class="btn btn-danger">Удалить</a>
-                </div>
-              </div>
             </div>
-          </div>
-          <tr>
-            <td>
-              <a href="{% url 'group-details' group.id %}">{{ group.title }}</a>
-            </td>
-            <td><span class="">{{ group.course }}</span></td>
-            <td>
-              <ul class="list-unstyled m-0 avatar-group d-flex align-items-center">
-                {% for teacher in group.teacher_set.all %}
-                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                  class="avatar avatar-xs pull-up" aria-label="{{ teacher.name }}"
-                  data-bs-original-title="{{ teacher.name }}">
-                  <img
-                    src="https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg"
-                    alt="Avatar" class="rounded-circle">
-                </li>
-                {% endfor %}
-              </ul>
-            </td>
-            <td>
-              <ul class="list-unstyled m-0 avatar-group d-flex align-items-center">
-                {% for student in group.student_set.all %}
-                <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
-                  class="avatar avatar-xs pull-up" aria-label="{{ student.name }}"
-                  data-bs-original-title="{{ student.name }}">
-                  <img
-                    src="https://static.vecteezy.com/system/resources/thumbnails/005/129/844/small_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg"
-                    alt="Avatar" class="rounded-circle">
-                </li>
-                {% endfor %}
-              </ul>
-            </td>
-            <td>
-              {% if request.user.role != 'student' %}
-              <div class="dropdown">
-                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i
-                    class="bx bx-dots-vertical-rounded"></i></button>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{% url 'group-update' group.id %}"><i class="bx bx-edit-alt me-1"></i>Изменить</a>
-                  <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                    data-bs-target="#modalCenter-{{ group.id }}">
-                    <i class="bx bx-trash me-1"></i>
-                    Удалить
-                  </button>
-                </div>
-              </div>
-              {% else %}
-              -
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
+        </div>
     </div>
-  </div>
+
+    <!-- Groups Grid -->
+    <div class="row">
+        {% for group in groups %}
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+            <div class="card h-100 group-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="avatar">
+                            <span class="avatar-initial rounded bg-label-primary">
+                                <i class="bx bx-group bx-sm"></i>
+                            </span>
+                        </div>
+                        {% if request.user.role != 'student' %}
+                        <div class="dropdown">
+                            <button class="btn p-0" type="button" data-bs-toggle="dropdown">
+                                <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'group:details' group.id %}">
+                                    <i class="bx bx-show me-2"></i>Детали группы
+                                </a>
+                                <a class="dropdown-item" href="{% url 'group:update' group.id %}">
+                                    <i class="bx bx-edit-alt me-2"></i>Редактировать
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item text-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalCenter-{{ group.id }}">
+                                    <i class="bx bx-trash me-2"></i>Удалить
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <h5 class="card-title mb-2">{{ group.title }}</h5>
+                    
+                    {% if group.course %}
+                        <p class="text-muted mb-3">
+                            <i class="bx bx-book-bookmark me-1"></i>
+                            {{ group.course.title }}
+                        </p>
+                    {% endif %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-user me-2 text-info"></i>
+                                <div>
+                                    <span class="fw-semibold d-block">{{ group.student_set.count }}</span>
+                                    <small class="text-muted">студентов</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bx bx-user-check me-2 text-success"></i>
+                                <div>
+                                    <span class="fw-semibold d-block">{{ group.teacher_set.count }}</span>
+                                    <small class="text-muted">преподавателей</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Преподаватели -->
+                    {% if group.teacher_set.all %}
+                    <div class="mb-3">
+                        <small class="text-muted">Преподаватели:</small>
+                        <div class="d-flex flex-wrap gap-1 mt-1">
+                            {% for teacher in group.teacher_set.all|slice:":3" %}
+                                <span class="badge bg-label-success">{{ teacher.name|truncatechars:15 }}</span>
+                            {% endfor %}
+                            {% if group.teacher_set.count > 3 %}
+                                <span class="badge bg-label-secondary">+{{ group.teacher_set.count|add:"-3" }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid">
+                        <a href="{% url 'group:details' group.id %}" class="btn btn-primary">
+                            <i class="bx bx-show me-1"></i>
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal для удаления -->
+        <div class="modal fade" id="modalCenter-{{ group.id }}" tabindex="-1" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalCenterTitle">Удаление группы</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <i class="bx bx-error-circle bx-lg text-danger mb-3"></i>
+                            <h6>Вы уверены, что хотите удалить группу?</h6>
+                            <p class="text-muted">{{ group.title }}</p>
+                            <small class="text-warning">Это действие нельзя отменить!</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <a href="{% url 'group:delete' group.id %}" class="btn btn-danger">Удалить</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-3">
+                        <i class="bx bx-group bx-lg text-muted"></i>
+                    </div>
+                    <h5 class="text-muted">Группы не найдены</h5>
+                    <p class="text-muted mb-4">В системе пока нет созданных групп.</p>
+                    {% if request.user.role != 'student' %}
+                        <a href="{% url 'group:create' %}" class="btn btn-primary">
+                            <i class="bx bx-plus me-1"></i>Создать группу
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 
+<style>
+.group-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e7eaf3;
+}
+
+.group-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 25px 0 rgba(105, 108, 255, 0.1);
+}
+
+.avatar-initial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
 {% endblock %}

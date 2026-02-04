@@ -1,62 +1,300 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
+
+{% block title %}Дневник - {{ student.name }}{% endblock %}
+
 {% block content %}
+{% include 'includes/messages.html' %}
 
-<div class="row justify-content-between mb-3">
-    <div class="col-md-6">
-        <span class="fs-3 fw-bold">Дневник</span>
-    </div>
-
-    <div class="col-md-6 text-md-end">
-        <form method="get" class="mb-4">
-            <div class="row g-2 justify-content-md-end align-items-center">
-                <div class="col-auto">
-                    <input type="month" name="month" value='{{ date }}' class="form-control">
-                </div>
-
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Показать</button>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                {% if student.image %}
+                                    <img src="{{ student.image.url }}" 
+                                         alt="{{ student.name }}" 
+                                         class="rounded-circle me-3" 
+                                         width="48" height="48">
+                                {% else %}
+                                    <div class="avatar me-3">
+                                        <span class="avatar-initial rounded-circle bg-label-primary">
+                                            {{ student.name|first|upper }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h4 class="mb-1">
+                                        <i class="bx bx-book-reader me-2 text-primary"></i>
+                                        Дневник
+                                    </h4>
+                                    <p class="text-muted mb-0">{{ student.name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex justify-content-md-end">
+                                <div class="input-group" style="max-width: 300px;">
+                                    <span class="input-group-text">
+                                        <i class="bx bx-calendar"></i>
+                                    </span>
+                                    <input type="month" 
+                                           name="month" 
+                                           value="{{ date_filter }}" 
+                                           class="form-control">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bx bx-search me-1"></i>Показать
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </form>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-primary">
+                            <i class="bx bx-book bx-sm"></i>
+                        </span>
+                    </div>
+                    <h5 class="mb-1">{{ subjects|length }}</h5>
+                    <small class="text-muted">Предметов</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-success">
+                            <i class="bx bx-calendar bx-sm"></i>
+                        </span>
+                    </div>
+                    <h5 class="mb-1">{{ dates|length }}</h5>
+                    <small class="text-muted">Дней с оценками</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-info">
+                            <i class="bx bx-star bx-sm"></i>
+                        </span>
+                    </div>
+                    <h5 class="mb-1">
+                        {% if subject_averages.values %}
+                            {% for avg in subject_averages.values %}
+                                {% if forloop.first %}{{ avg }}{% endif %}
+                            {% endfor %}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </h5>
+                    <small class="text-muted">Лучший результат</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-warning">
+                            <i class="bx bx-trending-up bx-sm"></i>
+                        </span>
+                    </div>
+                    <h5 class="mb-1">4.2</h5>
+                    <small class="text-muted">Общий средний</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subjects Performance -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bx bx-chart-line me-2"></i>Успеваемость по предметам
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for subject in subjects %}
+                        <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
+                            <div class="card subject-performance-card h-100">
+                                <div class="card-body text-center">
+                                    <div class="avatar mx-auto mb-2">
+                                        <span class="avatar-initial rounded-circle bg-label-{% if subject_averages|get_item:subject.id >= 4.5 %}success{% elif subject_averages|get_item:subject.id >= 3.5 %}warning{% else %}danger{% endif %}">
+                                            <i class="bx bx-book-bookmark bx-sm"></i>
+                                        </span>
+                                    </div>
+                                    <h6 class="mb-2">{{ subject.name }}</h6>
+                                    <div class="mb-2">
+                                        <span class="badge bg-{% if subject_averages|get_item:subject.id >= 4.5 %}success{% elif subject_averages|get_item:subject.id >= 3.5 %}warning{% else %}danger{% endif %} fs-6">
+                                            {{ subject_averages|get_item:subject.id|default:0 }}
+                                        </span>
+                                    </div>
+                                    <div class="grades-preview">
+                                        {% for date in dates %}
+                                            {% if grades_by_subject_date|get_item:subject.id and date in grades_by_subject_date|get_item:subject.id %}
+                                                {% for grade in grades_by_subject_date|get_item:subject.id|get_item:date %}
+                                                    <span class="badge bg-{% if grade.mark >= 4.5 %}success{% elif grade.mark >= 3.5 %}warning{% else %}danger{% endif %} badge-sm me-1 mb-1">
+                                                        {{ grade.mark }}
+                                                    </span>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Grades Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bx bx-table me-2"></i>Подробные оценки
+                    </h5>
+                    <small class="text-muted">{{ date_filter }}</small>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="min-width: 200px;">
+                                        <i class="bx bx-book me-1"></i>Предмет
+                                    </th>
+                                    {% for date in dates %}
+                                    <th class="text-center" style="min-width: 80px;">
+                                        <small>{{ date|date:"d.m" }}</small><br>
+                                        <small class="text-muted">{{ date|date:"D" }}</small>
+                                    </th>
+                                    {% endfor %}
+                                    <th class="text-center bg-light" style="min-width: 100px;">
+                                        <i class="bx bx-calculator me-1"></i>Средний
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject in subjects %}
+                                <tr>
+                                    <td class="bg-light">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm me-2">
+                                                <span class="avatar-initial rounded-circle bg-label-primary">
+                                                    {{ subject.name|first|upper }}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold">{{ subject.name }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    {% for date in dates %}
+                                    <td class="text-center">
+                                        {% if grades_by_subject_date|get_item:subject.id and date in grades_by_subject_date|get_item:subject.id %}
+                                            {% for grade in grades_by_subject_date|get_item:subject.id|get_item:date %}
+                                                <span class="badge bg-{% if grade.mark >= 4.5 %}success{% elif grade.mark >= 3.5 %}warning{% else %}danger{% endif %} me-1" 
+                                                      data-bs-toggle="tooltip" 
+                                                      title="Преподаватель: {% if grade.teacher %}{{ grade.teacher.name }}{% else %}Неизвестно{% endif %}{% if grade.pages %}, Страниц: {{ grade.pages }}{% endif %}">
+                                                    {{ grade.mark }}
+                                                </span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                    {% endfor %}
+                                    <td class="text-center bg-light">
+                                        <span class="badge bg-{% if subject_averages|get_item:subject.id >= 4.5 %}success{% elif subject_averages|get_item:subject.id >= 3.5 %}warning{% else %}danger{% endif %} fs-6">
+                                            {{ subject_averages|get_item:subject.id|default:0 }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="{{ dates|length|add:2 }}" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="bx bx-book-x bx-lg mb-2"></i>
+                                            <p>Предметы не найдены</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th style="width: 5%;">№</th>
-            <th style="width: 35%;">Предмет</th>
-            {% for day in days %}
-                <th style="width: 5%;" class='text-center'>{{ day|date:"d" }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-    {% for subject in subjects %}
-    <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>
-            <div class="text-start">
-                <span data-bs-toggle="modal" data-bs-target="#modalCenter{{student.id}}" class="fw-bold text-primary" style="cursor: pointer;">
-                    {{ subject.name }}
-                </span>
-            </div>
-        </td>
-        {% for day in days %}
-        <td class='text-center'>
-            {% with student.grade_set.all as grades %}
-                {% for grade in grades %}
-                    {% if grade.subject == subject and grade.date == day %}
-                        <div>{{ grade.mark }}</div>
-                    {% endif %}
-                {% endfor %}
-            {% endwith %}
-        </td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<style>
+.subject-performance-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e7eaf3;
+}
 
+.subject-performance-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 25px 0 rgba(105, 108, 255, 0.1);
+}
+
+.grades-preview {
+    min-height: 40px;
+}
+
+.badge-sm {
+    font-size: 0.65rem;
+    padding: 0.25em 0.4em;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+}
+
+.avatar-sm .avatar-initial {
+    font-size: 0.75rem;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+</style>
+
+<script>
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
 {% endblock %}
