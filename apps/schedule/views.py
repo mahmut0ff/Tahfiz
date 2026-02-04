@@ -24,7 +24,7 @@ def schedule(request):
     # Get days with schedule counts
     days = Day.objects.annotate(
         schedule_count=Count('schedule')
-    ).all()
+    ).order_by('order')
     
     subjects = Subject.objects.all()
     
@@ -65,7 +65,7 @@ def schedule(request):
 def calendar_view(request):
     schedules = Schedule.objects.select_related("group", "day", "subject").all()
     groups = Group.objects.all()
-    days = Day.objects.all()
+    days = Day.objects.order_by('order')
     subjects = Subject.objects.all()
     
     context = {
