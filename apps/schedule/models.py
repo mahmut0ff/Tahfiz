@@ -6,10 +6,12 @@ class Day(models.Model):
     """День недели"""
 
     title = models.CharField(max_length=50)
+    order = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = 'День'
         verbose_name_plural = 'Дни'
+        ordering = ['order']
 
     def __str__(self):
         return self.title
