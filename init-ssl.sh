@@ -16,10 +16,10 @@ cp nginx/nginx-init.conf nginx/nginx.conf.bak
 cp nginx/nginx-init.conf nginx/nginx.conf
 
 echo "==> Запускаем nginx..."
-docker-compose up -d nginx
+docker compose up -d nginx
 
 echo "==> Получаем SSL сертификат..."
-docker-compose run --rm certbot certonly \
+docker compose run --rm certbot certonly \
     --webroot \
     --webroot-path=/var/www/certbot \
     --email $EMAIL \
@@ -33,6 +33,6 @@ cp nginx/nginx.conf.bak nginx/nginx.conf
 rm nginx/nginx.conf.bak
 
 echo "==> Перезапускаем nginx с SSL..."
-docker-compose restart nginx
+docker compose restart nginx
 
 echo "==> Готово! SSL сертификат установлен."
