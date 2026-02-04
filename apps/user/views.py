@@ -8,7 +8,7 @@ from apps.user.models import User
 
 def login_page(request):
     if request.user.is_authenticated:
-        return redirect('dashboard:dashboard')
+        return redirect('schedule:list')
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -19,7 +19,7 @@ def login_page(request):
             
             login(request, user)
             messages.success(request, 'Вы вошли в систему')
-            return redirect('dashboard:dashboard')
+            return redirect('schedule:list')
         else:
             messages.error(request, 'Неверное имя пользователя или пароль')
 

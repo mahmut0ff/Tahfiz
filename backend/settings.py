@@ -133,7 +133,7 @@ AUTH_USER_MODEL = 'user.User'
 
 # Login URLs
 LOGIN_URL = 'user:login'
-LOGIN_REDIRECT_URL = 'dashboard:dashboard'
+LOGIN_REDIRECT_URL = 'schedule:list'
 LOGOUT_REDIRECT_URL = 'user:login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
