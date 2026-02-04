@@ -20,12 +20,12 @@
                             </h4>
                             <p class="text-muted mb-0 d-none d-sm-block">Управление преподавательским составом</p>
                         </div>
-                        <div class="d-flex flex-wrap align-items-center gap-2 w-100 w-md-auto">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
                             <span class="badge bg-label-warning">
                                 <i class="bx bx-user-check me-1"></i>
                                 {{ teachers.count }} преподавателей
                             </span>
-                            <a href="{% url 'teacher:create' %}" class="btn btn-warning flex-grow-1 flex-md-grow-0">
+                            <a href="{% url 'teacher:create' %}" class="btn btn-warning">
                                 <i class="bx bx-plus me-1"></i><span class="d-none d-sm-inline">Добавить </span>преподавателя
                             </a>
                         </div>

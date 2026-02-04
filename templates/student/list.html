@@ -20,12 +20,12 @@
                             </h4>
                             <p class="text-muted mb-0 d-none d-sm-block">Управление учащимися</p>
                         </div>
-                        <div class="d-flex flex-wrap align-items-center gap-2 w-100 w-md-auto">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
                             <span class="badge bg-label-info">
                                 <i class="bx bx-user me-1"></i>
                                 {{ students.count }} студентов
                             </span>
-                            <a href="{% url 'student:create' %}" class="btn btn-info flex-grow-1 flex-md-grow-0">
+                            <a href="{% url 'student:create' %}" class="btn btn-info">
                                 <i class="bx bx-plus me-1"></i><span class="d-none d-sm-inline">Добавить </span>студента
                             </a>
                         </div>

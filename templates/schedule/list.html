@@ -20,13 +20,13 @@
                             </h4>
                             <p class="text-muted mb-0 d-none d-sm-block">Управление учебным расписанием медресе</p>
                         </div>
-                        <div class="d-flex flex-wrap gap-2 w-100 w-md-auto">
+                        <div class="d-flex flex-wrap gap-2">
                             {% if request.user.role == 'admin' %}
-                            <a href="{% url 'schedule:subject_create' %}" class="btn btn-success flex-grow-1 flex-md-grow-0">
+                            <a href="{% url 'schedule:subject_create' %}" class="btn btn-success">
                                 <i class="bx bx-book me-1"></i><span class="d-none d-sm-inline">Добавить </span>предмет
                             </a>
                             {% endif %}
-                            <a href="{% url 'schedule:calendar' %}" class="btn btn-outline-primary flex-grow-1 flex-md-grow-0">
+                            <a href="{% url 'schedule:calendar' %}" class="btn btn-outline-primary">
                                 <i class="bx bx-calendar me-1"></i>Календарь
                             </a>
                         </div>
