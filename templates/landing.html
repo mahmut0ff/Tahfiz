@@ -1,0 +1,787 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тахфиз - Исламский университет в Оше</title>
+    <meta name="description" content="Тахфиз - современный исламский университет в Оше. 5 курсов обучения, Коран, тажвид, спорт. Полноценное образование в комфортных условиях.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/img/logo/logo.png' %}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #0a4d3c;
+            --primary-light: #0d6b54;
+            --gold: #d4af37;
+            --gold-light: #f4d03f;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: #fff;
+            overflow-x: hidden;
+        }
+        /* Animations */
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes rotateY { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 20px var(--gold); } 50% { box-shadow: 0 0 40px var(--gold), 0 0 60px var(--gold); } }
+        .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+        nav.scrolled {
+            background: rgba(10, 77, 60, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-decoration: none;
+        }
+        .logo img { height: 45px; }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+        .nav-links a:hover { color: var(--gold); }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .btn-login {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--dark);
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-login:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4); }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="p" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23d4af37" opacity="0.1"/></pattern></defs><rect fill="url(%23p)" width="100" height="100"/></svg>');
+            opacity: 0.5;
+        }
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            padding: 0 2rem;
+            max-width: 900px;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: slideUp 1s ease;
+        }
+        .hero p {
+            font-size: 1.3rem;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 2.5rem;
+            animation: slideUp 1s ease 0.2s both;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: slideUp 1s ease 0.4s both;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--dark);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4); }
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-secondary:hover { background: var(--gold); color: var(--dark); }
+
+        /* 3D Element */
+        .hero-3d {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 400px;
+            perspective: 1000px;
+        }
+        .cube {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateY 20s infinite linear;
+            margin: auto;
+        }
+        .cube-face {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.1));
+            border: 2px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            backdrop-filter: blur(5px);
+        }
+        .cube-face:nth-child(1) { transform: rotateY(0deg) translateZ(75px); }
+        .cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(75px); }
+        .cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(75px); }
+        .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(75px); }
+        .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(75px); }
+        .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(75px); }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.6;
+        }
+        .floating-element:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-element:nth-child(2) { top: 60%; left: 5%; animation-delay: 1s; }
+        .floating-element:nth-child(3) { top: 30%; right: 15%; animation-delay: 2s; }
+        .floating-element i { font-size: 2rem; color: var(--gold); }
+
+        /* Stats Section */
+        .stats {
+            background: var(--primary);
+            padding: 4rem 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            transition: transform 0.3s;
+        }
+        .stat-item:hover { transform: translateY(-10px); }
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--gold);
+            display: block;
+        }
+        .stat-label { font-size: 1.1rem; color: rgba(255,255,255,0.8); }
+
+        /* About Section */
+        .about {
+            padding: 6rem 5%;
+            background: var(--dark);
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        .section-title h2 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        .section-title span { color: var(--gold); }
+        .section-title p { color: rgba(255,255,255,0.7); font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .about-card {
+            background: linear-gradient(135deg, rgba(10, 77, 60, 0.5), rgba(10, 77, 60, 0.2));
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        .about-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        .about-card:hover::before { left: 100%; }
+        .about-card:hover { transform: translateY(-10px); border-color: var(--gold); }
+        .about-card i { font-size: 3rem; color: var(--gold); margin-bottom: 1.5rem; display: block; }
+        .about-card h3 { font-size: 1.5rem; margin-bottom: 1rem; color: #fff; }
+        .about-card p { color: rgba(255,255,255,0.7); line-height: 1.7; }
+
+        /* Courses Section */
+        .courses {
+            padding: 6rem 5%;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--dark) 100%);
+        }
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .course-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.4s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .course-card:hover { transform: scale(1.03); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .course-header {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            padding: 2rem;
+            text-align: center;
+        }
+        .course-header i { font-size: 3rem; color: var(--dark); }
+        .course-header h3 { color: var(--dark); font-size: 1.4rem; margin-top: 1rem; font-weight: 700; }
+        .course-body { padding: 2rem; }
+        .course-body p { color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 1.5rem; }
+        .course-features { list-style: none; }
+        .course-features li {
+            padding: 0.5rem 0;
+            color: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .course-features li i { color: var(--gold); }
+
+        /* Facilities Section */
+        .facilities {
+            padding: 6rem 5%;
+            background: var(--dark);
+        }
+        .facilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .facility-item {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .facility-item:hover { background: rgba(212, 175, 55, 0.2); transform: translateY(-5px); }
+        .facility-item i { font-size: 2.5rem; color: var(--gold); margin-bottom: 1rem; display: block; }
+        .facility-item h4 { color: #fff; margin-bottom: 0.5rem; }
+        .facility-item p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+
+        /* CTA Section */
+        .cta {
+            padding: 6rem 5%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        .cta-content { position: relative; z-index: 10; max-width: 800px; margin: 0 auto; }
+        .cta h2 { font-size: 2.5rem; margin-bottom: 1.5rem; }
+        .cta p { font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 2rem; }
+        .whatsapp-btn {
+            background: #25D366;
+            color: #fff;
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            animation: glow 2s ease-in-out infinite;
+        }
+        .whatsapp-btn:hover { transform: scale(1.05); background: #128C7E; }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            padding: 4rem 5% 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto 3rem;
+        }
+        .footer-col h4 { color: var(--gold); margin-bottom: 1.5rem; font-size: 1.2rem; }
+        .footer-col p, .footer-col a { color: rgba(255,255,255,0.7); line-height: 1.8; text-decoration: none; display: block; }
+        .footer-col a:hover { color: var(--gold); }
+        .footer-col i { margin-right: 10px; color: var(--gold); }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+        }
+        .social-links { display: flex; gap: 1rem; margin-top: 1rem; }
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            transition: all 0.3s;
+        }
+        .social-links a:hover { background: var(--gold); color: var(--dark); }
+
+        /* Mobile Menu */
+        .menu-toggle { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background: var(--primary);
+                flex-direction: column;
+                justify-content: center;
+                transition: right 0.3s;
+            }
+            .nav-links.active { right: 0; }
+            .hero-3d { display: none; }
+            .hero h1 { font-size: 2.2rem; }
+            .hero p { font-size: 1rem; }
+            .stat-number { font-size: 2.5rem; }
+            .section-title h2 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <a href="#" class="logo">
+            <img src="{% static 'assets/img/logo/logo.png' %}" alt="Тахфиз">
+            ТАХФИЗ
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="#about">О нас</a>
+            <a href="#courses">Курсы</a>
+            <a href="#facilities">Условия</a>
+            <a href="#contact">Контакты</a>
+            <a href="{% url 'user:login' %}" class="btn-login">Войти</a>
+        </div>
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="floating-element"><i class="fas fa-star"></i></div>
+        <div class="floating-element"><i class="fas fa-moon"></i></div>
+        <div class="floating-element"><i class="fas fa-book-quran"></i></div>
+        
+        <div class="hero-content">
+            <h1>Исламский университет<br>нового поколения</h1>
+            <p>Тахфиз — это современное медресе в городе Ош, где традиционное исламское образование сочетается с комфортными условиями обучения. 5 курсов, спорт, Коран и тажвид.</p>
+            <div class="hero-buttons">
+                <a href="https://wa.me/996000000000" class="btn-primary" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Связаться с нами
+                </a>
+                <a href="#courses" class="btn-secondary">Узнать больше</a>
+            </div>
+        </div>
+        
+        <div class="hero-3d">
+            <div class="cube">
+                <div class="cube-face"><i class="fas fa-book-quran"></i></div>
+                <div class="cube-face"><i class="fas fa-mosque"></i></div>
+                <div class="cube-face"><i class="fas fa-graduation-cap"></i></div>
+                <div class="cube-face"><i class="fas fa-star-and-crescent"></i></div>
+                <div class="cube-face"><i class="fas fa-hands-praying"></i></div>
+                <div class="cube-face"><i class="fas fa-heart"></i></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stat-item animate-on-scroll">
+            <span class="stat-number" data-target="5">0</span>
+            <span class="stat-label">Курсов обучения</span>
+        </div>
+        <div class="stat-item animate-on-scroll">
+            <span class="stat-number" data-target="200">0</span>
+            <span class="stat-label">Студентов</span>
+        </div>
+        <div class="stat-item animate-on-scroll">
+            <span class="stat-number" data-target="15">0</span>
+            <span class="stat-label">Преподавателей</span>
+        </div>
+        <div class="stat-item animate-on-scroll">
+            <span class="stat-number" data-target="10">0</span>
+            <span class="stat-label">Лет опыта</span>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="section-title animate-on-scroll">
+            <h2>Почему выбирают <span>Тахфиз</span>?</h2>
+            <p>Мы создали уникальную образовательную среду, где каждый студент получает качественные знания</p>
+        </div>
+        <div class="about-grid">
+            <div class="about-card animate-on-scroll">
+                <i class="fas fa-book-quran"></i>
+                <h3>Изучение Корана</h3>
+                <p>Глубокое изучение Священного Корана с опытными преподавателями. Программа хифз для желающих выучить Коран наизусть.</p>
+            </div>
+            <div class="about-card animate-on-scroll">
+                <i class="fas fa-microphone"></i>
+                <h3>Тажвид</h3>
+                <p>Правильное произношение и чтение Корана по всем правилам тажвида. Индивидуальный подход к каждому студенту.</p>
+            </div>
+            <div class="about-card animate-on-scroll">
+                <i class="fas fa-dumbbell"></i>
+                <h3>Спорт и здоровье</h3>
+                <p>Физическое развитие — важная часть образования. Спортивные занятия, футбол, волейбол и другие активности.</p>
+            </div>
+            <div class="about-card animate-on-scroll">
+                <i class="fas fa-users"></i>
+                <h3>Сообщество</h3>
+                <p>Дружная атмосфера и поддержка единомышленников. Студенты становятся частью большой семьи Тахфиз.</p>
+            </div>
+            <div class="about-card animate-on-scroll">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <h3>Опытные преподаватели</h3>
+                <p>Наши учителя — выпускники ведущих исламских университетов мира с многолетним опытом преподавания.</p>
+            </div>
+            <div class="about-card animate-on-scroll">
+                <i class="fas fa-certificate"></i>
+                <h3>Официальный диплом</h3>
+                <p>По окончании обучения выпускники получают официальный диплом, признаваемый исламскими учреждениями.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section class="courses" id="courses">
+        <div class="section-title animate-on-scroll">
+            <h2>Наши <span>курсы</span></h2>
+            <p>5 курсов полноценного исламского образования</p>
+        </div>
+        <div class="courses-grid">
+            <div class="course-card animate-on-scroll">
+                <div class="course-header">
+                    <i class="fas fa-seedling"></i>
+                    <h3>1 курс — Основы</h3>
+                </div>
+                <div class="course-body">
+                    <p>Начальный уровень для новичков. Изучение арабского алфавита, основ ислама и начало чтения Корана.</p>
+                    <ul class="course-features">
+                        <li><i class="fas fa-check"></i> Арабский алфавит</li>
+                        <li><i class="fas fa-check"></i> Основы веры</li>
+                        <li><i class="fas fa-check"></i> Начальный тажвид</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="course-card animate-on-scroll">
+                <div class="course-header">
+                    <i class="fas fa-book-open"></i>
+                    <h3>2 курс — Развитие</h3>
+                </div>
+                <div class="course-body">
+                    <p>Углубление знаний. Продолжение изучения Корана, арабского языка и исламских наук.</p>
+                    <ul class="course-features">
+                        <li><i class="fas fa-check"></i> Чтение Корана</li>
+                        <li><i class="fas fa-check"></i> Арабская грамматика</li>
+                        <li><i class="fas fa-check"></i> Фикх (основы)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="course-card animate-on-scroll">
+                <div class="course-header">
+                    <i class="fas fa-star"></i>
+                    <h3>3 курс — Углубление</h3>
+                </div>
+                <div class="course-body">
+                    <p>Серьёзное погружение в исламские науки. Хифз Корана, тафсир и хадисоведение.</p>
+                    <ul class="course-features">
+                        <li><i class="fas fa-check"></i> Хифз Корана</li>
+                        <li><i class="fas fa-check"></i> Тафсир</li>
+                        <li><i class="fas fa-check"></i> Хадисы</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="course-card animate-on-scroll">
+                <div class="course-header">
+                    <i class="fas fa-award"></i>
+                    <h3>4 курс — Мастерство</h3>
+                </div>
+                <div class="course-body">
+                    <p>Продвинутый уровень. Глубокое изучение исламского права, акыды и арабской риторики.</p>
+                    <ul class="course-features">
+                        <li><i class="fas fa-check"></i> Усуль аль-фикх</li>
+                        <li><i class="fas fa-check"></i> Акыда</li>
+                        <li><i class="fas fa-check"></i> Балага</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="course-card animate-on-scroll">
+                <div class="course-header">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3>5 курс — Выпускной</h3>
+                </div>
+                <div class="course-body">
+                    <p>Завершающий этап. Подготовка к самостоятельной деятельности и получение диплома.</p>
+                    <ul class="course-features">
+                        <li><i class="fas fa-check"></i> Дипломная работа</li>
+                        <li><i class="fas fa-check"></i> Практика</li>
+                        <li><i class="fas fa-check"></i> Иджаза</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Facilities Section -->
+    <section class="facilities" id="facilities">
+        <div class="section-title animate-on-scroll">
+            <h2>Условия <span>обучения</span></h2>
+            <p>Всё необходимое для комфортного обучения и проживания</p>
+        </div>
+        <div class="facilities-grid">
+            <div class="facility-item animate-on-scroll">
+                <i class="fas fa-bed"></i>
+                <h4>Общежитие</h4>
+                <p>Комфортные комнаты для проживания студентов</p>
+            </div>
+            <div class="facility-item animate-on-scroll">
+                <i class="fas fa-utensils"></i>
+                <h4>Питание</h4>
+                <p>Трёхразовое халяльное питание</p>
+            </div>
+            <div class="facility-item animate-on-scroll">
+                <i class="fas fa-mosque"></i>
+                <h4>Мечеть</h4>
+                <p>Собственная мечеть на территории</p>
+            </div>
+            <div class="facility-item animate-on-scroll">
+                <i class="fas fa-book"></i>
+                <h4>Библиотека</h4>
+                <p>Богатая коллекция исламской литературы</p>
+            </div>
+            <div class="facility-item animate-on-scroll">
+                <i class="fas fa-futbol"></i>
+                <h4>Спортзал</h4>
+                <p>Современный спортивный зал</p>
+            </div>
+            <div class="facility-item animate-on-scroll">
+                <i class="fas fa-wifi"></i>
+                <h4>Интернет</h4>
+                <p>Бесплатный Wi-Fi на территории</p>
+            </div>
+            <div class="facility-item animate-on-scroll">
+                <i class="fas fa-shield-alt"></i>
+                <h4>Безопасность</h4>
+                <p>Охрана территории 24/7</p>
+            </div>
+            <div class="facility-item animate-on-scroll">
+                <i class="fas fa-first-aid"></i>
+                <h4>Медпункт</h4>
+                <p>Медицинская помощь при необходимости</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="contact">
+        <div class="cta-content animate-on-scroll">
+            <h2>Готовы начать свой путь к знаниям?</h2>
+            <p>Свяжитесь с нами через WhatsApp для получения подробной информации о поступлении и обучении в медресе Тахфиз</p>
+            <a href="https://wa.me/996000000000" class="whatsapp-btn" target="_blank">
+                <i class="fab fa-whatsapp"></i> Написать в WhatsApp
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>О медресе</h4>
+                <p>Тахфиз — современный исламский университет в городе Ош, Кыргызстан. Мы предоставляем качественное исламское образование в комфортных условиях.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Контакты</h4>
+                <p><i class="fas fa-map-marker-alt"></i> г. Ош, Кыргызстан</p>
+                <p><i class="fas fa-phone"></i> +996 (000) 00-00-00</p>
+                <p><i class="fas fa-envelope"></i> info@tahfiz.kg</p>
+                <p><i class="fab fa-whatsapp"></i> WhatsApp: +996 000 000 000</p>
+            </div>
+            <div class="footer-col">
+                <h4>Навигация</h4>
+                <a href="#about">О нас</a>
+                <a href="#courses">Курсы</a>
+                <a href="#facilities">Условия</a>
+                <a href="#contact">Контакты</a>
+                <a href="{% url 'user:login' %}">Вход в систему</a>
+            </div>
+            <div class="footer-col">
+                <h4>Режим работы</h4>
+                <p>Приёмная комиссия:</p>
+                <p>Пн-Пт: 9:00 - 17:00</p>
+                <p>Сб: 10:00 - 14:00</p>
+                <p>Вс: выходной</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Медресе Тахфиз. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Mobile menu toggle
+        function toggleMenu() {
+            document.getElementById('navLinks').classList.toggle('active');
+        }
+
+        // Animate on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+        // Counter animation
+        const counters = document.querySelectorAll('.stat-number');
+        counters.forEach(counter => {
+            const target = +counter.getAttribute('data-target');
+            const increment = target / 50;
+            const updateCounter = () => {
+                const current = +counter.innerText;
+                if (current < target) {
+                    counter.innerText = Math.ceil(current + increment);
+                    setTimeout(updateCounter, 30);
+                } else {
+                    counter.innerText = target + '+';
+                }
+            };
+            observer.observe(counter.parentElement);
+            counter.parentElement.addEventListener('transitionend', updateCounter, { once: true });
+        });
+    </script>
+</body>
+</html>

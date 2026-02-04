@@ -13,6 +13,13 @@ from .forms import *
 from apps.user.utils import is_admin
 
 
+def landing(request):
+    """Главная страница - лендинг"""
+    if request.user.is_authenticated:
+        return redirect('schedule:list')
+    return render(request, 'landing.html')
+
+
 @login_required(login_url='user:login')
 @is_admin
 def dashboard(request):
