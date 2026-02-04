@@ -43,14 +43,26 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/media:ro
+      - certbot_www:/var/www/certbot:ro
+      - certbot_conf:/etc/letsencrypt:ro
     depends_on:
       - web
+
+  certbot:
+    image: certbot/certbot
+    container_name: tahfiz_certbot
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_conf:/etc/letsencrypt
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  certbot_www:
+  certbot_conf:
