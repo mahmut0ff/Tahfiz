@@ -5,7 +5,7 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-t-jexhxi&n@tm&_q^3q2_6(^5m89-^5%q+f6#mv6&9y50@+zsd')
 DEBUG = config('DEBUG', default=True, cast=bool)  # По умолчанию False для продакшна
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='tahfiz.site,cl17008-django-ksta7.tw1.ru', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='tahfiz.site,cl17008-django-ksta7.tw1.ru,188.240.213.66', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition
